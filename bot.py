@@ -208,7 +208,7 @@ async def status_task() -> None:
     await bot.change_presence(activity=discord.Game(random.choice(statuses)))
     bot.logger.info("Changes bot status")
 
-@tasks.loop(minutes=7.0)
+@tasks.loop(hours=168.0)
 async def loop_keep_alive() -> None:
     """
     Setup the keep alive loop
