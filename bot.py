@@ -17,7 +17,7 @@ import aiosqlite
 import discord
 from discord.ext import commands, tasks
 from discord.ext.commands import Bot, Context
-from helpers import configuration_manager, db_manager, dcsupport
+from helpers import configuration_manager, db_manager, dcsupport, kick_unverified
 from helpers.logger import setup_logger
 import exceptions
 
@@ -146,6 +146,7 @@ async def on_ready() -> None:
     bot.logger.info("-------------------")
     status_task.start()
     loop_keep_alive.start()
+    kick_users.start()
     if sync_commands_globally:
         bot.logger.info("Syncing commands globally...")
         await bot.tree.sync()
@@ -168,6 +169,14 @@ async def loop_keep_alive() -> None:
     """
     bot.logger.info("Started keep alive task")
     await keep_them_all_alive()
+
+@tasks.loop(hours=8.0)
+async def kick_users() -> None:
+    """
+    Setup the kick unverified users loop
+    """
+    bot.logger.info("Started kick unverified users task")
+    await kick_unverified.kick_unverified_accounts(bot)
 
 @bot.event
 async def on_message(message: discord.Message) -> None:

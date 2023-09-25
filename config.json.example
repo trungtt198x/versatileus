@@ -10,5 +10,8 @@
   ],
   "dc_bot_channel": [
     887252461767786506
-  ]
+  ],
+  "unverified_role_name": "YOUR_GROUP_NAME_HERE",
+  "unverified_role_id": "YOUR_GROUP_ID_HERE",
+  "verified_role_id": "YOUR_GROUP_ID_HERE"
 }
