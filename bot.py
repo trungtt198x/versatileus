@@ -224,6 +224,7 @@ async def on_message(message: discord.Message) -> None:
     :param message: The message that was sent.
     """
     if message.author == bot.user or message.author.bot:
+        dcsupport.ban_main_account(message):
         return
     await bot.process_commands(message)
 
