@@ -7,26 +7,29 @@ Version: 5.5.0
 """
 
 import asyncio
-import json
-import logging
+
 import os
 import platform
 import random
-import sys
+import logging
 
 import aiosqlite
 import discord
 from discord.ext import commands, tasks
 from discord.ext.commands import Bot, Context
-from helpers import db_manager
-
+from helpers import configuration_manager, db_manager, dcsupport
+from helpers.logger import setup_logger
 import exceptions
 
-if not os.path.isfile(f"{os.path.realpath(os.path.dirname(__file__))}/config.json"):
-    sys.exit("'config.json' not found! Please add it and try again.")
-else:
-    with open(f"{os.path.realpath(os.path.dirname(__file__))}/config.json") as file:
-        config = json.load(file)
+# Set up the logger
+setup_logger()
+
+# Load configuration
+config = configuration_manager.load_config('config.json')
+prefix = config["prefix"]
+token = config["token"]
+sync_commands_globally = config["sync_commands_globally"]
+dc_bot_channel = config["dc_bot_channel"]
 
 """
 Setup bot intents (events restrictions)
@@ -62,7 +65,7 @@ intents.presences = True
 """
 
 intents = discord.Intents.default()
-
+intents.message_content = True
 """
 Uncomment this if you want to use prefix (normal) commands.
 It is recommended to use slash commands and therefore not use prefix commands.
@@ -72,62 +75,12 @@ If you want to use prefix commands, make sure to also enable the intent below in
 # intents.message_content = True
 
 bot = Bot(
-    command_prefix=commands.when_mentioned_or(config["prefix"]),
+    command_prefix=commands.when_mentioned_or(prefix),
     intents=intents,
     help_command=None,
 )
 
-# Setup both of the loggers
-
-
-class LoggingFormatter(logging.Formatter):
-    # Colors
-    black = "\x1b[30m"
-    red = "\x1b[31m"
-    green = "\x1b[32m"
-    yellow = "\x1b[33m"
-    blue = "\x1b[34m"
-    gray = "\x1b[38m"
-    # Styles
-    reset = "\x1b[0m"
-    bold = "\x1b[1m"
-
-    COLORS = {
-        logging.DEBUG: gray + bold,
-        logging.INFO: blue + bold,
-        logging.WARNING: yellow + bold,
-        logging.ERROR: red,
-        logging.CRITICAL: red + bold,
-    }
-
-    def format(self, record):
-        log_color = self.COLORS[record.levelno]
-        format = "(black){asctime}(reset) (levelcolor){levelname:<8}(reset) (green){name}(reset) {message}"
-        format = format.replace("(black)", self.black + self.bold)
-        format = format.replace("(reset)", self.reset)
-        format = format.replace("(levelcolor)", log_color)
-        format = format.replace("(green)", self.green + self.bold)
-        formatter = logging.Formatter(format, "%Y-%m-%d %H:%M:%S", style="{")
-        return formatter.format(record)
-
-
-logger = logging.getLogger("discord_bot")
-logger.setLevel(logging.INFO)
-
-# Console handler
-console_handler = logging.StreamHandler()
-console_handler.setFormatter(LoggingFormatter())
-# File handler
-file_handler = logging.FileHandler(filename="discord.log", encoding="utf-8", mode="w")
-file_handler_formatter = logging.Formatter(
-    "[{asctime}] [{levelname:<8}] {name}: {message}", "%Y-%m-%d %H:%M:%S", style="{"
-)
-file_handler.setFormatter(file_handler_formatter)
-
-# Add the handlers
-logger.addHandler(console_handler)
-logger.addHandler(file_handler)
-bot.logger = logger
+bot.logger = logging.getLogger("discord_bot")
 
 
 async def init_db():
@@ -178,7 +131,7 @@ The config is available using the following code:
 - bot.config # In this file
 - self.bot.config # In cogs
 """
-bot.config = config
+bot.configuration_manager = configuration_manager
 
 
 @bot.event
@@ -193,7 +146,7 @@ async def on_ready() -> None:
     bot.logger.info("-------------------")
     status_task.start()
     loop_keep_alive.start()
-    if config["sync_commands_globally"]:
+    if sync_commands_globally:
         bot.logger.info("Syncing commands globally...")
         await bot.tree.sync()
 
@@ -224,8 +177,11 @@ async def on_message(message: discord.Message) -> None:
     :param message: The message that was sent.
     """
     if message.author == bot.user or message.author.bot:
-        dcsupport.ban_main_account(message):
         return
+
+    for dc_channel_id in dc_bot_channel:
+        if message.channel.id == int(dc_channel_id):
+            await dcsupport.ban_main_account(message)
     await bot.process_commands(message)
 
 
@@ -345,4 +301,4 @@ async def load_cogs() -> None:
 asyncio.run(init_db())
 asyncio.run(load_cogs())
 
-bot.run(config["token"])
+bot.run(token)
