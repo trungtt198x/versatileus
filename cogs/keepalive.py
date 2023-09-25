@@ -60,7 +60,7 @@ class Keepalive(commands.Cog, name="keepalive"):
     )
     # This will only allow owners of the bot to execute the command -> config.json
     @checks.is_owner()
-    async def rmthread(self, context: Context, thread_id: int):
+    async def rmthread(self, context: Context, thread_id: str):
         """
         This is a testing command that does nothing.
 
@@ -70,6 +70,7 @@ class Keepalive(commands.Cog, name="keepalive"):
         # Connect to database
         thread_ids = await db_manager.get_keep_alive_thread()
         guild_id = int(context.guild.id)
+        thread_id = int(thread_id) # This is needed because /commands do not like long ints in Discord
 
         if thread_id not in thread_ids:
             embed = discord.Embed(
