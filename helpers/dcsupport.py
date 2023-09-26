@@ -23,22 +23,26 @@ async def ban_main_account(message):
     # Read the mesage
     logger.debug("Reading the message")
     logger.debug(message.content)
-    if message.content.startswith(dc_message_content):
-        if message.author.bot == True:
-            logger.info("User matched")
-            dc_verify_message =  message.content.casefold()
+    try:
+        if message.content.startswith(dc_message_content):
+            if message.author.bot == True:
+                logger.info("User matched")
+                dc_verify_message =  message.content.casefold()
 
-            temp = re.findall(r'\d+', dc_verify_message)
-            res = list(map(int, temp))
-            for i in range(0, len(res)):
-                if i == (len(res)-1):
-                    continue
-            res.reverse()
-            
-            await message.channel.send("Bye bye " + str(res[0]))
-            userid_to_ban = int(res[0])
-                    
-            await message.guild.ban(discord.Object(id=userid_to_ban))
-            print(str(userid_to_ban) + " gone")
-        else:
-            logger.info("It is not an ALT account message")
+                temp = re.findall(r'\d+', dc_verify_message)
+                res = list(map(int, temp))
+                for i in range(0, len(res)):
+                    if i == (len(res)-1):
+                        continue
+                res.reverse()
+                
+                await message.channel.send("Bye bye " + str(res[0]))
+                userid_to_ban = int(res[0])
+                        
+                await message.guild.ban(discord.Object(id=userid_to_ban))
+                print(str(userid_to_ban) + " gone")
+            else:
+                logger.info("It is not an ALT account message")
+    except Exception as e:
+        # Handle the exception here
+        logger.error(f"An exception occurred: {e}")

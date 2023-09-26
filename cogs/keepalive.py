@@ -8,9 +8,11 @@ Version: 5.5.0
 import discord
 from discord.ext import commands
 from discord.ext.commands import Context
+import logging
 
 from helpers import checks, db_manager
 
+logger = logging.getLogger("discord_bot")
 
 # Here we name the cog and create a new class for the cog.
 class Keepalive(commands.Cog, name="keepalive"):
@@ -72,13 +74,15 @@ class Keepalive(commands.Cog, name="keepalive"):
         guild_id = int(context.guild.id)
         thread_id = int(thread_id) # This is needed because /commands do not like long ints in Discord
 
-        if thread_id not in thread_ids:
-            embed = discord.Embed(
-                description=f"Thread {thread_id} was not being kept alive anyway",
-                color=0xE02B2B,
-            )
-            await context.send(embed=embed)
-            return
+        for threads in thread_ids:
+            logger.info(f"for loop {threads}")
+            if threads not in thread_ids:
+                embed = discord.Embed(
+                    description=f"Thread {threads} was not being kept alive anyway",
+                    color=0xE02B2B,
+                )
+                await context.send(embed=embed)
+                return
 
         await db_manager.remove_keep_alive_thread(thread_id, guild_id)
         embed = discord.Embed(
