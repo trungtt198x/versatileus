@@ -18,15 +18,16 @@ dc_bot_channel = config["dc_bot_channel"]
 
 async def ban_main_account(message):
     # Define the message part input that triggers the bot
-    dc_message_content = str(":small_red_triangle: Alt-account intrusion")
+    dc_message_content = str("🔺 Alt-account intrusion")
 
     # Read the mesage
     logger.debug("Reading the message")
     logger.debug(message.content)
+    logger.debug(dc_message_content)
     try:
         if message.content.startswith(dc_message_content):
             if message.author.bot == True:
-                logger.info("User matched")
+                logger.debug("User matched")
                 dc_verify_message =  message.content.casefold()
 
                 temp = re.findall(r'\d+', dc_verify_message)
@@ -36,13 +37,14 @@ async def ban_main_account(message):
                         continue
                 res.reverse()
                 
-                await message.channel.send("Bye bye " + str(res[0]))
+                await message.channel.send("Banning main account\n Bye bye " + str(res[0]))
                 userid_to_ban = int(res[0])
                         
                 await message.guild.ban(discord.Object(id=userid_to_ban))
-                print(str(userid_to_ban) + " gone")
+                logger.info(str(userid_to_ban) + " gone")
             else:
-                logger.info("It is not an ALT account message")
+                logger.info("This is NOT an alt account message")
+    
     except Exception as e:
         # Handle the exception here
         logger.error(f"An exception occurred: {e}")
