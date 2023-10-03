@@ -20,13 +20,14 @@ dc_bot_channel = config["dc_bot_channel"]
 async def ban_main_account(message):
     # Define the message part input that triggers the bot
     dc_message_content = str("🔺 Alt-account intrusion")
+    dc_message_content_string = str(":small_red_triangle: Alt-account intrusion")
 
     # Read the mesage
     logger.debug("Reading the message")
     logger.debug(message.content)
     logger.debug(dc_message_content)
     try:
-        if message.content.startswith(dc_message_content):
+        if message.content.startswith(dc_message_content) or message.content.startswith(dc_message_content_string):
             if message.author.bot:
                 logger.debug("User matched")
                 dc_verify_message = message.content.casefold()
