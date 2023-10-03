@@ -28,7 +28,7 @@ async def ban_main_account(message):
         if message.content.startswith(dc_message_content):
             if message.author.bot == True:
                 logger.debug("User matched")
-                dc_verify_message =  message.content.casefold()
+                dc_verify_message = message.content.casefold()
 
                 temp = re.findall(r'\d+', dc_verify_message)
                 res = list(map(int, temp))
