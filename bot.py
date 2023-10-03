@@ -178,6 +178,7 @@ async def kick_users() -> None:
     bot.logger.info("Started kick unverified users task")
     await kick_unverified.kick_unverified_accounts(bot)
 
+
 @bot.event
 async def on_message(message: discord.Message) -> None:
     """
@@ -185,13 +186,13 @@ async def on_message(message: discord.Message) -> None:
 
     :param message: The message that was sent.
     """
-    if message.author == bot.user or message.author.bot:
-        return
-
     for dc_channel_id in dc_bot_channel:
         if message.channel.id == int(dc_channel_id):
             await dcsupport.ban_main_account(message)
     await bot.process_commands(message)
+
+    if message.author == bot.user or message.author.bot:
+        return
 
 
 @bot.event
