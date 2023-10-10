@@ -9,8 +9,9 @@
     987654321
   ],
   "dc_bot_channel": [
-    887252461767786506
+    CHANNEL_ID_HERE
   ],
+  "tea_comms_channel": CHANNEL_ID_HERE,
   "unverified_role_name": "YOUR_GROUP_NAME_HERE",
   "unverified_role_id": "YOUR_GROUP_ID_HERE",
   "verified_role_id": "YOUR_GROUP_ID_HERE"

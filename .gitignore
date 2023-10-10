@@ -148,3 +148,6 @@ discord.log
 
 # Configuration file
 config.json
+
+# Tests folder
+tests/

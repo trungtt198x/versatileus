@@ -30,6 +30,7 @@ prefix = config["prefix"]
 token = config["token"]
 sync_commands_globally = config["sync_commands_globally"]
 dc_bot_channel = config["dc_bot_channel"]
+tea_comms_channel = config["tea_comms_channel"]
 
 """
 Setup bot intents (events restrictions)
