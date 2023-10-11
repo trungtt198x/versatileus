@@ -35,7 +35,8 @@ Please do not open issues or pull requests about things that are written in the 
   https://discord.com/oauth2/authorize?&client_id=YOUR_APPLICATION_ID_HERE&scope=bot+applications.commands&permissions=PERMISSIONS (
   Replace `YOUR_APPLICATION_ID_HERE` with the application ID and replace `PERMISSIONS` with the required permissions
   your bot needs that it can be get at the bottom of a this
-  page https://discord.com/developers/applications/YOUR_APPLICATION_ID_HERE/bot)
+  page https://discord.com/developers/applications/YOUR_APPLICATION_ID_HERE/bot)  
+  example: `https://discord.com/api/oauth2/authorize?client_id=997115454139154452&permissions=277025482816&scope=bot%20applications.commands`
 
 ## How to set up
 

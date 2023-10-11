@@ -73,9 +73,13 @@ class Talktocomms(commands.Cog, name="talktocomms"):
         ) -> None:
         submitted_by_user_id = context.author.id
         submitted_by_user_name = context.author.name
-        await context.send(f"Thanks for submitting {tweet_url} in {tweet_categories.name}", ephemeral=True)
         channel = self.bot.get_channel(tea_comms_channel)
-        
+        logger.info(channel)
+        await context.send(f"<@{submitted_by_user_id}>!\nThanks for submitting {tweet_url} in {tweet_categories.name}\n\n \
+                        \n**CONTENT GUIDELINES REMINDER**\nRemember, we won't engage or reshare posts containing: \
+                        \n- Investment & financial content *(advice, promises of returns, ISC token sales, price pumping, speculation, coin value, staking & rewards, TVL...)* \
+                        \n- Unsubstantiated or misleading claims *(audits without proof, implying potential partnerships by tagging high profile accounts, unlikely ETAs...)* \
+                        \n- General inappropriate content in a professional setting *(like sexualized imagery/language, trolling/insulting, harassement, private information, drama...)*", ephemeral=True)
         await channel.send(f"Hello <@105306128761503744>\nTweet Category:\n{tweet_categories.value}\nURL:\n{tweet_url}\nSubmitted_by:\n@{submitted_by_user_name}\n\n------\n")
         logger.debug(f"URL: {tweet_url}, category: {tweet_categories.value}, submitted_by: @{submitted_by_user_name}, submitter_id: {submitted_by_user_id}")
 
