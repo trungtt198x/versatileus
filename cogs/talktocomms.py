@@ -12,7 +12,7 @@ from discord.ext.commands import Context
 from discord.app_commands import Choice
 from helpers import checks
 import helpers.configuration_manager as configuration_manager
-
+import re
 import logging
 
 logger = logging.getLogger("discord_bot")
@@ -75,13 +75,21 @@ class Talktocomms(commands.Cog, name="talktocomms"):
         submitted_by_user_name = context.author.name
         channel = self.bot.get_channel(tea_comms_channel)
         logger.info(channel)
-        await context.send(f"<@{submitted_by_user_id}>!\nThanks for submitting {tweet_url} in {tweet_categories.name}\n\n \
+        # Regex pattern to match x.com or twitter.com
+        pattern = r"(x\.com|twitter\.com)"
+
+        # Check if tweet_url contains x.com or twitter.com
+        if re.search(pattern, tweet_url):
+            await context.send(f"✅ <@{submitted_by_user_id}>!\nThanks for submitting {tweet_url} in {tweet_categories.name}\n\n \
                         \n**CONTENT GUIDELINES REMINDER**\nRemember, we won't engage or reshare posts containing: \
                         \n- Investment & financial content *(advice, promises of returns, ISC token sales, price pumping, speculation, coin value, staking & rewards, TVL...)* \
                         \n- Unsubstantiated or misleading claims *(audits without proof, implying potential partnerships by tagging high profile accounts, unlikely ETAs...)* \
                         \n- General inappropriate content in a professional setting *(like sexualized imagery/language, trolling/insulting, harassement, private information, drama...)*", ephemeral=True)
-        await channel.send(f"Hello <@105306128761503744>\nTweet Category:\n{tweet_categories.value}\nURL:\n{tweet_url}\nSubmitted_by:\n@{submitted_by_user_name}\n\n------\n")
-        logger.debug(f"URL: {tweet_url}, category: {tweet_categories.value}, submitted_by: @{submitted_by_user_name}, submitter_id: {submitted_by_user_id}")
+            await channel.send(f"Tweet Category:\n{tweet_categories.value}\nURL:\n{tweet_url}\nSubmitted_by:\n@{submitted_by_user_name}\n\n------\n")
+            logger.debug(f"URL: {tweet_url}, category: {tweet_categories.value}, submitted_by: @{submitted_by_user_name}, submitter_id: {submitted_by_user_id}")
+        else:
+            await context.send(f"❌ <@{submitted_by_user_id}>, that is not a Twitter or X.com link!\nCheck the link and try again.", ephemeral=True)
+            logger.debug(f"URL: {tweet_url}, category: {tweet_categories.value}, submitted_by: @{submitted_by_user_name}, submitter_id: {submitted_by_user_id}")
 
 # And then we finally add the cog to the bot so that it can load, unload, reload and use it's content.
 async def setup(bot):
