@@ -1,7 +1,9 @@
 """"
 Copyright © Krypton 2019-2023 - https://github.com/kkrypt0nn (https://krypton.ninja)
 Description:
-🐍 A simple template to start to code your own and personalized discord bot in Python programming language.
+The setup_send_tweet function is responsible for processing a user's submission of a tweet URL.
+It checks if the URL is from Twitter or x.com, provides feedback to the user, and logs the submission and user information.
+Additionally, it forwards valid submissions to a specified Discord channel for further processing.
 
 Version: 5.5.0
 """
