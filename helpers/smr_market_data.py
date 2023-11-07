@@ -29,7 +29,7 @@ shimmer_onchain_deposit_alias = config["shimmer_onchain_deposit_alias"]
 
 # API URLs
 coingecko_exchange_url = f"https://api.coingecko.com/api/v3/exchanges/{coingecko_exchange_id}/tickers?coin_ids={coingecko_coin_id}"
-bitfinex_book_url = f"https://api-pub.bitfinex.com/v2/book/{bitfinex_ticker}/P0"
+bitfinex_book_url = f"https://api-pub.bitfinex.com/v2/book/{bitfinex_ticker}/R0?len=100"
 defillama_url = "https://api.llama.fi/v2/chains"
 geckoterminal_url = f"https://api.geckoterminal.com/api/v2/networks/{geckoterminal_ticker}/pools"
 shimmer_explorer_api_url = f"https://api.shimmer.network/api/indexer/v1/outputs/alias/{shimmer_onchain_deposit_alias}"
@@ -120,23 +120,25 @@ async def get_bitfinex_book_data(usd_price):
     book_response = None
     percentage_levels = [-2, 2, -5, 5, -10, 10, -20, 20]
     order_book_depth = {}
-    usd_price = float(usd_price)
 
     try:
         book_response = requests.get(bitfinex_book_url, headers=headers, timeout=10)
         book_response.raise_for_status()  # Raise HTTPError for bad requests (4xx and 5xx status codes)
         logger.debug("Bitfinex book response: %s", book_response.text)
+        logger.debug(usd_price)
         if book_response.status_code == 200:
             order_book_data = book_response.json()
 
+            # Iterate percentage levels
             for percentage in percentage_levels:
-                price_level = usd_price * (1 + percentage / 100)  # Calculate price level with percentage difference
+                price_level = usd_price * (1 + percentage / 100)
+                # price_level = round(price_level, 2)  # Round to 2 decimal places to match order book granularity
                 buy_quantity = 0
-                sell_quantity = 0  
-            
-                # Iterate through the entries and collect orderbook values
+                sell_quantity = 0
+
+                # Iterate through the entries and collect order book values
                 for order in order_book_data:
-                    price = order[0]
+                    price = order[1]
                     amount = order[2]
 
                     # If the order price is within the specified percentage range
@@ -144,8 +146,9 @@ async def get_bitfinex_book_data(usd_price):
                         buy_quantity += amount
                     elif price <= price_level and amount < 0:
                         sell_quantity -= amount  # Convert negative amount to positive for sell orders
-                    
+
                 order_book_depth[f'{percentage}%'] = {'buy': buy_quantity, 'sell': sell_quantity}
+
             logger.debug(f"Order book depth: %s", order_book_depth)
             return {"order_book_depth":  order_book_depth}
 
@@ -313,6 +316,7 @@ async def get_shimmer_data():
     except requests.exceptions.RequestException as err:
         logger.error("Request Exception occurred: %s", err)
 
+
 async def build_embed():
     """Here we save a pickel file for the Discord embed message"""
     # Execute functions to get data
@@ -333,6 +337,55 @@ async def build_embed():
     # Format the integer as a value with a currency separator
     formatted_shimmer_onchain_token_amount = await format_currency(shimmer_onchain_token_amount, "SMR")
  
+    # Set up Bitfinex order book depth
+    # Initialize empty strings for different percentage levels
+    positive_order_book_depth_str_2_percent = ""
+    negative_order_book_depth_str_2_percent = ""
+    positive_order_book_depth_str_5_percent = ""
+    negative_order_book_depth_str_5_percent = ""
+    positive_order_book_depth_str_10_percent = ""
+    negative_order_book_depth_str_10_percent = ""
+    positive_order_book_depth_str_20_percent = ""
+    negative_order_book_depth_str_20_percent = ""
+
+    # Iterate through the order book data and format the strings
+    for percentage, data in bitfinex_order_book_data['order_book_depth'].items():
+        # Format the 'buy' data using format_currency() function
+        if 'buy' in data:
+            formatted_buy_data = await format_currency(data['buy'], "SMR")
+            buy_data = f"Buy: {formatted_buy_data}\n\n"
+        else:
+            logger.error(f"Missing 'buy' key for percentage level {percentage}")
+        # Format the 'sell' data using format_currency() function
+        if 'sell' in data:
+            formatted_sell_data = await format_currency(data['sell'], "SMR")
+            sell_data = f"Sell: {formatted_sell_data}\n\n"
+        else:
+            logger.error(f"Missing 'sell' key for percentage level {percentage}")
+
+        # Check if the percentage is negative and append buy data only
+        if percentage.startswith('-'):
+            buy_sell_info = f"**{percentage}**:\n{buy_data}"
+            if int(percentage[:-1]) == -2:
+                negative_order_book_depth_str_2_percent += buy_sell_info
+            elif int(percentage[:-1]) == -5:
+                negative_order_book_depth_str_5_percent += buy_sell_info
+            elif int(percentage[:-1]) == -10:
+                negative_order_book_depth_str_10_percent += buy_sell_info
+            elif int(percentage[:-1]) == -20:
+                negative_order_book_depth_str_20_percent += buy_sell_info
+        # Check if the percentage is positive and append sell data only
+        else:
+            buy_sell_info = f"**{percentage}**:\n{sell_data}"
+            if int(percentage[:-1]) == 2:
+                positive_order_book_depth_str_2_percent += buy_sell_info
+            elif int(percentage[:-1]) == 5:
+                positive_order_book_depth_str_5_percent += buy_sell_info
+            elif int(percentage[:-1]) == 10:
+                positive_order_book_depth_str_10_percent += buy_sell_info
+            elif int(percentage[:-1]) == 20:
+                positive_order_book_depth_str_20_percent += buy_sell_info
+
     # Setup variables for the embed
     try:
         usd_price = formatted_usd_price
@@ -343,50 +396,6 @@ async def build_embed():
         shimmer_rank = defillama_data["shimmer_rank"]
         shimmer_onchain_token_amount = formatted_shimmer_onchain_token_amount
         bitfinex_order_book_data = bitfinex_order_book_data["order_book_depth"]
-        
-        # Set up Bitfinex order book depth
-        # Initialize empty strings for different percentage levels
-        positive_order_book_depth_str_2_percent = ""
-        negative_order_book_depth_str_2_percent = ""
-        positive_order_book_depth_str_5_percent = ""
-        negative_order_book_depth_str_5_percent = ""
-        positive_order_book_depth_str_10_percent = ""
-        negative_order_book_depth_str_10_percent = ""
-        positive_order_book_depth_str_20_percent = ""
-        negative_order_book_depth_str_20_percent = ""
-
-        # Iterate through the order book data and format the strings
-        for percentage, data in bitfinex_order_book_data.items():
-            # Format the 'buy' data using format_currency() function
-            formatted_buy_data = await format_currency(data['buy'], "SMR")
-            buy_data = f"Buy: {formatted_buy_data}\n\n"
-
-            # Format the 'sell' data using format_currency() function
-            formatted_sell_data = await format_currency(data['sell'], "SMR")
-            sell_data = f"Sell: {formatted_sell_data}\n\n"
-
-            # Check if the percentage is negative and append buy data only
-            if percentage.startswith('-'):
-                buy_sell_info = f"**{percentage}**:\n{buy_data}"
-                if int(percentage[:-1]) == -2:
-                    negative_order_book_depth_str_2_percent += buy_sell_info
-                elif int(percentage[:-1]) == -5:
-                    negative_order_book_depth_str_5_percent += buy_sell_info
-                elif int(percentage[:-1]) == -10:
-                    negative_order_book_depth_str_10_percent += buy_sell_info
-                elif int(percentage[:-1]) == -20:
-                    negative_order_book_depth_str_20_percent += buy_sell_info
-            # Check if the percentage is positive and append sell data only
-            else:
-                buy_sell_info = f"**{percentage}**:\n{sell_data}"
-                if int(percentage[:-1]) == 2:
-                    positive_order_book_depth_str_2_percent += buy_sell_info
-                elif int(percentage[:-1]) == 5:
-                    positive_order_book_depth_str_5_percent += buy_sell_info
-                elif int(percentage[:-1]) == 10:
-                    positive_order_book_depth_str_10_percent += buy_sell_info
-                elif int(percentage[:-1]) == 20:
-                    positive_order_book_depth_str_20_percent += buy_sell_info
 
         # Create an embed instance
         embed = discord.Embed(title="Shimmer Market Data", color=0x00FF00)
@@ -405,20 +414,20 @@ async def build_embed():
         # Add a blank field for separation
         embed.add_field(name="\u200b", value="\u200b", inline=False)
         embed.add_field(name="ShimmerEVM Order Books", value="\u200b", inline=False)
-        embed.add_field(name="Order Book depth ±2%", value=negative_order_book_depth_str_2_percent, inline=True)
-        embed.add_field(name="\u200b", value=positive_order_book_depth_str_2_percent, inline=True)
+        embed.add_field(name="Order Book depth ±2%", value=f"{negative_order_book_depth_str_2_percent} {positive_order_book_depth_str_2_percent}", inline=True)
+        # embed.add_field(name="\u200b", value=positive_order_book_depth_str_2_percent, inline=True)
         
         embed.add_field(name="\u200b", value="\u200b", inline=False)
-        embed.add_field(name="Order Book depth ±5%", value=negative_order_book_depth_str_5_percent, inline=True)
-        embed.add_field(name="\u200b", value=positive_order_book_depth_str_5_percent, inline=True)
+        embed.add_field(name="Order Book depth ±5%", value=f"{negative_order_book_depth_str_5_percent} {positive_order_book_depth_str_5_percent}", inline=True)
+        # embed.add_field(name="\u200b", value=positive_order_book_depth_str_5_percent, inline=True)
         
         embed.add_field(name="\u200b", value="\u200b", inline=False)
-        embed.add_field(name="Order Book depth ±10%", value=negative_order_book_depth_str_10_percent, inline=True)
-        embed.add_field(name="\u200b", value=positive_order_book_depth_str_10_percent, inline=True)
+        embed.add_field(name="Order Book depth ±10%", value=f"{negative_order_book_depth_str_10_percent} {positive_order_book_depth_str_10_percent}", inline=True)
+        # embed.add_field(name="\u200b", value=positive_order_book_depth_str_10_percent, inline=True)
         
         embed.add_field(name="\u200b", value="\u200b", inline=False)
-        embed.add_field(name="Order Book depth ±20%", value=negative_order_book_depth_str_20_percent, inline=True)
-        embed.add_field(name="\u200b", value=positive_order_book_depth_str_20_percent, inline=True)
+        embed.add_field(name="Order Book depth ±20%", value=f"{negative_order_book_depth_str_20_percent} {positive_order_book_depth_str_20_percent}", inline=True)
+        # embed.add_field(name="\u200b", value=positive_order_book_depth_str_20_percent, inline=True)
         # Add a blank field for separation
         embed.add_field(name="\u200b", value="\u200b", inline=False)
 
