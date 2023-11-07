@@ -1,5 +1,5 @@
 """"
-Copyright © Krypton 2019-2023 - https://github.com/kkrypt0nn (https://krypton.ninja)
+Copyright © antonionardella 2023 - https://github.com/antonionardella (https://antonionardella.it)
 Description:
 The setup_send_tweet function is responsible for processing a user's submission of a tweet URL.
 It checks if the URL is from Twitter or x.com, provides feedback to the user, and logs the submission and user information.
@@ -12,9 +12,9 @@ from discord import app_commands
 from discord.ext import commands
 from discord.ext.commands import Context
 from discord.app_commands import Choice
+import re
 from helpers import checks
 import helpers.configuration_manager as configuration_manager
-import re
 import logging
 
 logger = logging.getLogger("discord_bot")

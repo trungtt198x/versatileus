@@ -12,12 +12,14 @@ import os
 import platform
 import random
 import logging
-
+import asyncio
+import time
+import multiprocessing
 import aiosqlite
 import discord
 from discord.ext import commands, tasks
 from discord.ext.commands import Bot, Context
-from helpers import configuration_manager, db_manager, dcsupport, kick_unverified
+from helpers import configuration_manager, db_manager, dcsupport, kick_unverified, smr_market_data, embed_and_messages
 from helpers.logger import setup_logger
 import exceptions
 
@@ -82,6 +84,22 @@ bot = Bot(
 )
 
 bot.logger = logging.getLogger("discord_bot")
+
+
+def background_task():
+    """Launched background tasks"""
+    bot.logger.info("Starting background tasks for the DLT ledger data")
+    asyncio.run(smr_market_data.main())
+    time.sleep(24 * 60 * 60)
+    background_task()
+
+
+def run_bot():
+    """Starts the discord bot"""
+    asyncio.run(init_db())
+    asyncio.run(load_cogs())
+    asyncio.run(embed_and_messages.create_empty_embed_and_messages())
+    bot.run(token)
 
 
 async def init_db():
@@ -308,8 +326,10 @@ async def load_cogs() -> None:
                 exception = f"{type(e).__name__}: {e}"
                 bot.logger.error(f"Failed to load extension {extension}\n{exception}")
 
+# Create processing for the bot and the background tasks
+process_one = multiprocessing.Process(target=run_bot)
+process_two = multiprocessing.Process(target=background_task)
 
-asyncio.run(init_db())
-asyncio.run(load_cogs())
-
-bot.run(token)
+# Start the processes
+process_one.start()
+process_two.start()
