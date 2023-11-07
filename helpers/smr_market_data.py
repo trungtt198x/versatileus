@@ -94,20 +94,13 @@ async def get_coingecko_exchange_data():
                     usd_price += ticker["last"]
                 elif ticker["target"] == "USDT":
                     usdt_volume += ticker["converted_volume"]["usd"]
-            
-            logger.debug("Total USD Converted Volume for USD: %s", usd_volume)
+
             logger.debug("Last USD Price: %s", usd_price)
+            logger.debug("Total USD Converted Volume for USD: %s", usd_volume)
             logger.debug("Total USD Converted Volume for USDT: %s", usdt_volume)
             twentyfourh_volume = usd_volume + usdt_volume
             logger.debug("Total USD Converted 24h Volume for Shimmer: %s", twentyfourh_volume)
-            # Format the integer as a dollar value with a currency separator
-            formatted_volume = await format_currency(twentyfourh_volume)
-            formatted_usd_price = await format_currency(usd_price)
-
-            # Log the formatted 24-hour volume
-            logger.debug("Total USD formatted 24h Volume for Shimmer: %s", formatted_volume)
-            logger.debug("Last USD formatted price for Shimmer: %s", formatted_usd_price)
-            return {"usd_price": formatted_usd_price, "total_volume": formatted_volume}
+            return {"usd_price": usd_price, "total_volume": twentyfourh_volume}
 
         else:
             logger.debug("Error: Unable to fetch data from the API.")
@@ -121,13 +114,41 @@ async def get_coingecko_exchange_data():
     
 
 
-async def get_bitfinex_book_data():
+async def get_bitfinex_book_data(usd_price):
     """Get Bitfinex order book"""
     headers = {"accept": "application/json"}
+    book_response = None
+    percentage_levels = [-2, 2, -5, 5, -10, 10, -20, 20]
+    order_book_depth = {}
+    usd_price = float(usd_price)
+
     try:
         book_response = requests.get(bitfinex_book_url, headers=headers, timeout=10)
         book_response.raise_for_status()  # Raise HTTPError for bad requests (4xx and 5xx status codes)
         logger.debug("Bitfinex book response: %s", book_response.text)
+        if book_response.status_code == 200:
+            order_book_data = book_response.json()
+
+            for percentage in percentage_levels:
+                price_level = usd_price * (1 + percentage / 100)  # Calculate price level with percentage difference
+                buy_quantity = 0
+                sell_quantity = 0  
+            
+                # Iterate through the entries and collect orderbook values
+                for order in order_book_data:
+                    price = order[0]
+                    amount = order[2]
+
+                    # If the order price is within the specified percentage range
+                    if price >= price_level and amount > 0:
+                        buy_quantity += amount
+                    elif price <= price_level and amount < 0:
+                        sell_quantity -= amount  # Convert negative amount to positive for sell orders
+                    
+                order_book_depth[f'{percentage}%'] = {'buy': buy_quantity, 'sell': sell_quantity}
+            logger.debug(f"Order book depth: %s", order_book_depth)
+            return {"order_book_depth":  order_book_depth}
+
     except requests.exceptions.Timeout:
         logger.error("Bitfinex API request timed out.")
     except requests.exceptions.HTTPError as errh:
@@ -152,7 +173,7 @@ async def get_defillama_data():
 
             # Iterate through entries and collect TVL values
             for entry in tvl_data:
-                gecko_id = entry.get("gecko_id")
+                # gecko_id = entry.get("gecko_id")
                 name = entry.get("name")
                 tvl = entry.get("tvl")
                 if name and tvl:
@@ -176,11 +197,9 @@ async def get_defillama_data():
                     break
 
             if shimmer_tvl is not None:
-                # Format the integer as a dollar value with a currency separator
-                formatted_tvl = await format_currency(shimmer_tvl)
-                logger.debug("Shimmer TVL Value: %s", formatted_tvl)
+                logger.debug("Shimmer TVL Value: %s", shimmer_tvl)
                 logger.debug("Shimmer TVL Rank: %s", rank)
-                return {"shimmer_tvl":  formatted_tvl, "shimmer_rank": rank}
+                return {"shimmer_tvl":  shimmer_tvl, "shimmer_rank": rank}
             else:
                 logger.debug("Shimmer TVL Value not found in the response.")
 
@@ -230,10 +249,9 @@ async def get_geckoterminal_data():
 
                 if total_defi_volume_usd_h24 > 0:
                     if total_buy_tx_h24 > 0 and total_sell_tx_h24 > 0:
-                        formatted_defi_volume = await format_currency(total_defi_volume_usd_h24)
-                        logger.debug("Shimmer Defi Volume: %s", formatted_defi_volume)
+                        logger.debug("Shimmer Defi Volume: %s", total_defi_volume_usd_h24)
                         total_defi_tx_24h = total_buy_tx_h24 + total_sell_tx_h24
-                        return {"defi_total_volume":  formatted_defi_volume, "total_defi_tx_24h": total_defi_tx_24h}
+                        return {"defi_total_volume":  total_defi_volume_usd_h24, "total_defi_tx_24h": total_defi_tx_24h}
                 else:
                     logger.debug("Shimmer Total Volume not found in the response.")
             elif defi_volume.status_code == 404:
@@ -280,12 +298,8 @@ async def get_shimmer_data():
                         break
             
             if shimmer_onchain_token_amount is not None:
-                # Format glow to SMR
-                shimmer_onchain_token_amount = await format_shimmer_amount(shimmer_onchain_token_amount)
-                # Format the integer as a value with a currency separator
-                formatted_shimmer_onchain_token_amount = await format_currency(shimmer_onchain_token_amount, "SMR")
-                logger.debug("Shimmer On Chain Amount: %s", formatted_shimmer_onchain_token_amount)
-                return {"shimmer_onchain_token_amount":  formatted_shimmer_onchain_token_amount}
+                logger.debug("Shimmer On Chain Amount: %s", shimmer_onchain_token_amount)
+                return {"shimmer_onchain_token_amount":  shimmer_onchain_token_amount}
             else:
                 logger.debug("Shimmer TVL Value not found in the response.")
 
@@ -301,20 +315,78 @@ async def get_shimmer_data():
 
 async def build_embed():
     """Here we save a pickel file for the Discord embed message"""
+    # Execute functions to get data
     current_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
     coingecko_data = await get_coingecko_exchange_data()
     defillama_data = await get_defillama_data()
     geckoterminal_data = await get_geckoterminal_data()
     shimmer_data = await get_shimmer_data()
+    bitfinex_order_book_data = await get_bitfinex_book_data(coingecko_data["usd_price"])
 
+    # Format variables that need currency formatting
+    formatted_usd_price = await format_currency(coingecko_data["usd_price"])
+    formatted_volume = await format_currency(coingecko_data["total_volume"])
+    formatted_defi_volume = await format_currency(geckoterminal_data["defi_total_volume"])
+    formatted_tvl = await format_currency(defillama_data["shimmer_tvl"])
+    # Format glow to SMR
+    shimmer_onchain_token_amount = await format_shimmer_amount(shimmer_data["shimmer_onchain_token_amount"])
+    # Format the integer as a value with a currency separator
+    formatted_shimmer_onchain_token_amount = await format_currency(shimmer_onchain_token_amount, "SMR")
+ 
+    # Setup variables for the embed
     try:
-        usd_price = coingecko_data["usd_price"]
-        total_volume = coingecko_data["total_volume"]
-        defi_total_volume = geckoterminal_data["defi_total_volume"]
+        usd_price = formatted_usd_price
+        total_volume = formatted_volume
+        defi_total_volume = formatted_defi_volume
         total_defi_tx_24h = geckoterminal_data["total_defi_tx_24h"]
-        shimmer_tvl = defillama_data["shimmer_tvl"]
+        shimmer_tvl = formatted_tvl
         shimmer_rank = defillama_data["shimmer_rank"]
-        shimmer_onchain_token_amount = shimmer_data["shimmer_onchain_token_amount"]
+        shimmer_onchain_token_amount = formatted_shimmer_onchain_token_amount
+        bitfinex_order_book_data = bitfinex_order_book_data["order_book_depth"]
+        
+        # Set up Bitfinex order book depth
+        # Initialize empty strings for different percentage levels
+        positive_order_book_depth_str_2_percent = ""
+        negative_order_book_depth_str_2_percent = ""
+        positive_order_book_depth_str_5_percent = ""
+        negative_order_book_depth_str_5_percent = ""
+        positive_order_book_depth_str_10_percent = ""
+        negative_order_book_depth_str_10_percent = ""
+        positive_order_book_depth_str_20_percent = ""
+        negative_order_book_depth_str_20_percent = ""
+
+        # Iterate through the order book data and format the strings
+        for percentage, data in bitfinex_order_book_data.items():
+            # Format the 'buy' data using format_currency() function
+            formatted_buy_data = await format_currency(data['buy'], "SMR")
+            buy_data = f"Buy: {formatted_buy_data}\n\n"
+
+            # Format the 'sell' data using format_currency() function
+            formatted_sell_data = await format_currency(data['sell'], "SMR")
+            sell_data = f"Sell: {formatted_sell_data}\n\n"
+
+            # Check if the percentage is negative and append buy data only
+            if percentage.startswith('-'):
+                buy_sell_info = f"**{percentage}**:\n{buy_data}"
+                if int(percentage[:-1]) == -2:
+                    negative_order_book_depth_str_2_percent += buy_sell_info
+                elif int(percentage[:-1]) == -5:
+                    negative_order_book_depth_str_5_percent += buy_sell_info
+                elif int(percentage[:-1]) == -10:
+                    negative_order_book_depth_str_10_percent += buy_sell_info
+                elif int(percentage[:-1]) == -20:
+                    negative_order_book_depth_str_20_percent += buy_sell_info
+            # Check if the percentage is positive and append sell data only
+            else:
+                buy_sell_info = f"**{percentage}**:\n{sell_data}"
+                if int(percentage[:-1]) == 2:
+                    positive_order_book_depth_str_2_percent += buy_sell_info
+                elif int(percentage[:-1]) == 5:
+                    positive_order_book_depth_str_5_percent += buy_sell_info
+                elif int(percentage[:-1]) == 10:
+                    positive_order_book_depth_str_10_percent += buy_sell_info
+                elif int(percentage[:-1]) == 20:
+                    positive_order_book_depth_str_20_percent += buy_sell_info
 
         # Create an embed instance
         embed = discord.Embed(title="Shimmer Market Data", color=0x00FF00)
@@ -322,6 +394,7 @@ async def build_embed():
         # Add fields to the embed
         embed.add_field(name="Price (Coingecko)", value=usd_price, inline=False)
         embed.add_field(name="24h Volume (Bitfinex)", value=total_volume, inline=False)
+        # Add a blank field for separation
         embed.add_field(name="\u200b", value="\u200b", inline=False)
         embed.add_field(name="Defi Data", value="\u200b", inline=False)
         embed.add_field(name="Shimmer Rank (DefiLlama)", value=shimmer_rank, inline=True)
@@ -329,7 +402,23 @@ async def build_embed():
         embed.add_field(name="Total Value Locked (DefiLlama)", value=shimmer_tvl, inline=True)
         embed.add_field(name="24h DeFi Transactions (DefiLlama)", value=total_defi_tx_24h, inline=True)
         embed.add_field(name="24h DeFi Volume (GeckoTerminal)", value=defi_total_volume, inline=True)
-
+        # Add a blank field for separation
+        embed.add_field(name="\u200b", value="\u200b", inline=False)
+        embed.add_field(name="ShimmerEVM Order Books", value="\u200b", inline=False)
+        embed.add_field(name="Order Book depth ±2%", value=negative_order_book_depth_str_2_percent, inline=True)
+        embed.add_field(name="\u200b", value=positive_order_book_depth_str_2_percent, inline=True)
+        
+        embed.add_field(name="\u200b", value="\u200b", inline=False)
+        embed.add_field(name="Order Book depth ±5%", value=negative_order_book_depth_str_5_percent, inline=True)
+        embed.add_field(name="\u200b", value=positive_order_book_depth_str_5_percent, inline=True)
+        
+        embed.add_field(name="\u200b", value="\u200b", inline=False)
+        embed.add_field(name="Order Book depth ±10%", value=negative_order_book_depth_str_10_percent, inline=True)
+        embed.add_field(name="\u200b", value=positive_order_book_depth_str_10_percent, inline=True)
+        
+        embed.add_field(name="\u200b", value="\u200b", inline=False)
+        embed.add_field(name="Order Book depth ±20%", value=negative_order_book_depth_str_20_percent, inline=True)
+        embed.add_field(name="\u200b", value=positive_order_book_depth_str_20_percent, inline=True)
         # Add a blank field for separation
         embed.add_field(name="\u200b", value="\u200b", inline=False)
 
@@ -337,7 +426,7 @@ async def build_embed():
         embed.add_field(name="Sources", value="Bitfinex, Coingecko, DefiLlama, GeckoTerminal, Shimmer API", inline=False)
 
         # Set the footer
-        embed.set_footer(text="Data updated every 24h; last updated: " + current_time)
+        embed.set_footer(text="Data updated every 24h; last updated: " + current_time + "\nMade with IOTA-❤️ by Antonio\nOut of beta SOON™")
 
         with open("assets/embed_shimmer_market_data.pkl", "wb") as f:
             pickle.dump(embed, f)
