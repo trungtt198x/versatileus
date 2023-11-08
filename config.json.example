@@ -16,7 +16,10 @@
   "unverified_role_name": "YOUR_GROUP_NAME_HERE",
   "unverified_role_id": "YOUR_GROUP_ID_HERE",
   "verified_role_id": "YOUR_GROUP_ID_HERE",
-  "bitfinex_ticker": "tSMRUSD"
+  "bitfinex_tickers": [
+    "tSMRUSD",
+    "tSMRUST"
+  ],
   "coingecko_coin_id": "shimmer",
   "coingecko_exchange_id": "bitfinex",
   "geckoterminal_ticker": "shimmerevm",

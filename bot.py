@@ -19,7 +19,7 @@ import aiosqlite
 import discord
 from discord.ext import commands, tasks
 from discord.ext.commands import Bot, Context
-from helpers import configuration_manager, db_manager, dcsupport, kick_unverified, smr_market_data, embed_and_messages
+from helpers import configuration_manager, db_manager, dcsupport, kick_unverified, embed_and_messages, smr_market_data_embed
 from helpers.logger import setup_logger
 import exceptions
 
@@ -89,7 +89,7 @@ bot.logger = logging.getLogger("discord_bot")
 def background_task():
     """Launched background tasks"""
     bot.logger.info("Starting background tasks for the DLT ledger data")
-    asyncio.run(smr_market_data.main())
+    asyncio.run(smr_market_data_embed.main())
     time.sleep(24 * 60 * 60)
     background_task()
 
