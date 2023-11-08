@@ -17,9 +17,16 @@ config = configuration_manager.load_config('config.json')
 shimmer_onchain_deposit_alias = config["shimmer_onchain_deposit_alias"]
 
 async def get_shimmer_data():
-    """Get Shimmer Explorer API data"""
+    """
+    Get Shimmer API data for the specified on-chain deposit alias.
+
+    Returns:
+        dict: Dictionary containing Shimmer's on-chain token amount.
+    """
+    logger.info("Getting data from Shimmer API")
     shimmer_explorer_api_url = f"https://api.shimmer.network/api/indexer/v1/outputs/alias/{shimmer_onchain_deposit_alias}"
     headers = {"accept": "application/json"}
+
     try:
         shimmer_api_response = requests.get(shimmer_explorer_api_url, headers=headers, timeout=10)
         shimmer_api_response.raise_for_status()
@@ -28,7 +35,6 @@ async def get_shimmer_data():
         if shimmer_api_response.status_code == 200:
             # Extract and parse the JSON response
             shimmer_api_response = shimmer_api_response.json()
-            
             response_output_id = shimmer_api_response.get("items", [])[0]
             shimmer_onchain_token_amount = None
 
@@ -44,7 +50,7 @@ async def get_shimmer_data():
                     else:
                         shimmer_onchain_token_amount = output_id_data.get("output", {}).get("amount")
                         break
-            
+
             if shimmer_onchain_token_amount is not None:
                 logger.debug("Shimmer On Chain Amount: %s", shimmer_onchain_token_amount)
                 return {"shimmer_onchain_token_amount":  shimmer_onchain_token_amount}

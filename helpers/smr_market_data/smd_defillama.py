@@ -14,53 +14,37 @@ logger = logging.getLogger("discord_bot")
 config = configuration_manager.load_config('config.json')
 
 async def get_defillama_data():
-    """Get DefiLlama TVL data"""
+    """
+    Get DefiLlama TVL data for ShimmerEVM.
+    
+    Returns:
+        dict: Dictionary containing ShimmerEVM TVL and rank.
+    """
+    logger.info("Getting the DefiLlama TVL and rank")
     defillama_url = "https://api.llama.fi/v2/chains"
     headers = {"accept": "*/*"}
     shimmer_tvl = None
-    tvl_entries = []
+    rank = None
 
     try:
         tvl_response = requests.get(defillama_url, headers=headers, timeout=10)
         tvl_response.raise_for_status()  # Raise HTTPError for bad requests (4xx and 5xx status codes)
         logger.debug("DefiLlama TVL response: %s", tvl_response.text)
+        
         if tvl_response.status_code == 200:
-            # Extract and parse the JSON response
             tvl_data = tvl_response.json()
+            shimmer_entry = next((entry for entry in tvl_data if entry.get("name") == "ShimmerEVM"), None)
+            
+            if shimmer_entry:
+                shimmer_tvl = shimmer_entry.get("tvl")
+                tvl_data.sort(key=lambda x: x.get("tvl", 0), reverse=True)
+                rank = tvl_data.index(shimmer_entry) + 1
 
-            # Iterate through entries and collect TVL values
-            for entry in tvl_data:
-                # gecko_id = entry.get("gecko_id")
-                name = entry.get("name")
-                tvl = entry.get("tvl")
-                if name and tvl:
-                    tvl_entries.append({"name": name, "tvl": tvl})
-
-            # Sort the entries based on TVL values
-            tvl_entries.sort(key=lambda x: x["tvl"], reverse=True)
-            # Sort the list of dictionaries based on 'tvl' values in descending order
-            sorted_data = sorted(tvl_entries, key=lambda x: x['tvl'], reverse=True)
-
-            # Extract gecko_ids from the sorted list
-            sorted_gecko_ids = [entry['name'] for entry in sorted_data]
-
-            logger.debug(sorted_gecko_ids)
-
-            # Find the rank of "shimmer" TVL
-            for index, entry in enumerate(tvl_entries, start=1):
-                if entry["name"] == "ShimmerEVM":
-                    shimmer_tvl = entry["tvl"]
-                    rank = index
-                    break
-
-            if shimmer_tvl is not None:
                 logger.debug("Shimmer TVL Value: %s", shimmer_tvl)
                 logger.debug("Shimmer TVL Rank: %s", rank)
-                return {"shimmer_tvl":  shimmer_tvl, "shimmer_rank": rank}
-            else:
-                logger.debug("Shimmer TVL Value not found in the response.")
+                
+        return {"shimmer_tvl": shimmer_tvl, "shimmer_rank": rank}
 
-        # Extract and sum the respective USD converted volumes for USD and USDT
     except requests.exceptions.Timeout:
         logger.error("DefiLlama API request timed out.")
     except requests.exceptions.HTTPError as errh:

@@ -5,10 +5,7 @@ Get API data for Shimmer from different sources
 
 Version: 5.5.0
 """
-import requests
 import logging
-import json
-import locale
 import discord
 import datetime
 import pickle
@@ -28,7 +25,11 @@ config = configuration_manager.load_config('config.json')
 
 # Functions
 async def build_embed():
-    """Here we save a pickel file for the Discord embed message"""
+    """
+    Build and save a Discord embed message containing Shimmer market data fetched from various sources.
+    """
+    logger.info("Building Discord embed message")
+
     try:
         # Get data from API calls
         current_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
@@ -55,12 +56,14 @@ async def build_embed():
 
         # Iterate through the order book data and format the strings
         for percentage, data in bitfinex_order_book_data['total_order_book_depth'].items():
+
             # Format the 'buy' data using format_currency() function
             if 'buy' in data:
                 formatted_buy_data = await format_currency(data['buy'], "SMR")
                 buy_data = f"Buy: {formatted_buy_data}\n\n"
             else:
                 logger.error(f"Missing 'buy' key for percentage level {percentage}")
+
             # Format the 'sell' data using format_currency() function
             if 'sell' in data:
                 formatted_sell_data = await format_currency(data['sell'], "SMR")
@@ -69,6 +72,7 @@ async def build_embed():
                 logger.error(f"Missing 'sell' key for percentage level {percentage}")
 
             buy_sell_info = f"**{percentage}**:\n{buy_data if percentage.startswith('-') else sell_data}"
+
             if int(percentage[:-1]) == -2:
                 negative_order_book_depth_str_2_percent += buy_sell_info
             elif int(percentage[:-1]) == -5:
@@ -95,7 +99,7 @@ async def build_embed():
         embed.add_field(name="Shimmer Rank (DefiLlama)", value=shimmer_rank, inline=True)
         embed.add_field(name="Shimmer Onchain Amount (Shimmer API)", value=f"{await format_currency(await format_shimmer_amount(shimmer_data['shimmer_onchain_token_amount']), 'SMR')}", inline=True)
         embed.add_field(name="Total Value Locked (DefiLlama)", value=f"{await format_currency(defillama_data['shimmer_tvl'])}", inline=True)
-        embed.add_field(name="24h DeFi Transactions (DefiLlama)", value=total_defi_tx_24h, inline=True)
+        embed.add_field(name="24h DeFi Transactions (GeckoTerminal)", value=total_defi_tx_24h, inline=True)
         embed.add_field(name="24h DeFi Volume (GeckoTerminal)", value=f"{await format_currency(geckoterminal_data['defi_total_volume'])}", inline=True)
         embed.add_field(name="\u200b", value="\u200b", inline=False)
         embed.add_field(name="ShimmerEVM Order Books", value="\u200b", inline=False)

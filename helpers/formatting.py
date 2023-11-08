@@ -4,7 +4,23 @@ Description:
 Currency formatting functions
 Version: 5.5.0
 """
+import logging
+
+logger = logging.getLogger("discord_bot")
+
 async def format_currency(value, currency_symbol="$"):
+    """
+    Format the given numerical value as a currency string with commas as thousands separators and a specified
+    currency symbol.
+
+    Args:
+        value (float): The numerical value to be formatted as currency.
+        currency_symbol (str, optional): The symbol to be used for the currency. Defaults to "$".
+
+    Returns:
+        str: Formatted currency string.
+    """
+    logger.info("Formatting for USD currency")
     # Split integer and decimal parts if there is a decimal point
     parts = str(value).split('.')
     integer_part = parts[0]
@@ -34,6 +50,16 @@ async def format_currency(value, currency_symbol="$"):
 
 
 async def format_shimmer_amount(value):
+    """
+    Format the given numerical value representing Shimmer tokens as a string with 2 decimal places.
+
+    Args:
+        value (float): The numerical value to be formatted as Shimmer tokens.
+
+    Returns:
+        str: Formatted Shimmer token string with 2 decimal places.
+    """
+    logger.info("Formatting glow to SMR")
     # Convert the number to a float and then format it with 2 decimal places
     formatted_value = '{:.2f}'.format(float(value) / 1000000)
     return formatted_value
