@@ -11,12 +11,13 @@ import datetime
 import pickle
 import traceback
 import helpers.configuration_manager as configuration_manager
-from helpers.formatting import format_currency, format_shimmer_amount
+from helpers.formatting import format_currency, format_shimmer_amount, generate_discord_timestamp
 from helpers.smr_market_data.smd_bitfinex import calculate_total_bitfinex_depth
 from helpers.smr_market_data.smd_coingecko import get_coingecko_exchange_data
 from helpers.smr_market_data.smd_shimmer import get_shimmer_data
 from helpers.smr_market_data.smd_geckoterminal import get_geckoterminal_data
 from helpers.smr_market_data.smd_defillama import get_defillama_data
+
 
 logger = logging.getLogger("discord_bot")
 
@@ -32,13 +33,14 @@ async def build_embed():
 
     try:
         # Get data from API calls
-        current_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
+        # current_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
         coingecko_data = await get_coingecko_exchange_data()
         defillama_data = await get_defillama_data()
         geckoterminal_data = await get_geckoterminal_data()
         shimmer_data = await get_shimmer_data()
         total_defi_tx_24h = geckoterminal_data["total_defi_tx_24h"]
         shimmer_rank = defillama_data["shimmer_rank"]
+        discord_timestamp = await generate_discord_timestamp()
 
         # Set up Bitfinex order book depth
         bitfinex_order_book_data = await calculate_total_bitfinex_depth(coingecko_data['usd_price'])
@@ -114,7 +116,8 @@ async def build_embed():
 
         # Add additional information
         embed.add_field(name="Sources", value="Bitfinex, Coingecko, DefiLlama, GeckoTerminal, Shimmer API", inline=False)
-        embed.set_footer(text="Data updated every 24h; last updated: " + current_time + "\nMade with IOTA-❤️ by Antonio\nOut of beta SOON™")
+        embed.add_field(name="Last Data Update", value=f"{discord_timestamp}", inline=False)
+        embed.set_footer(text="Data updated every 24h\nMade with IOTA-❤️ by Antonio\nOut of beta SOON™")
 
         # Save the embed to a pickle file
         with open("assets/embed_shimmer_market_data.pkl", "wb") as f:

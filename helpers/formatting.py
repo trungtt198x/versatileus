@@ -5,6 +5,7 @@ Currency formatting functions
 Version: 5.5.0
 """
 import logging
+import datetime
 
 logger = logging.getLogger("discord_bot")
 
@@ -20,7 +21,7 @@ async def format_currency(value, currency_symbol="$"):
     Returns:
         str: Formatted currency string.
     """
-    logger.info("Formatting for USD currency")
+    # logger.info("Formatting for USD currency")
     # Split integer and decimal parts if there is a decimal point
     parts = str(value).split('.')
     integer_part = parts[0]
@@ -59,7 +60,16 @@ async def format_shimmer_amount(value):
     Returns:
         str: Formatted Shimmer token string with 2 decimal places.
     """
-    logger.info("Formatting glow to SMR")
+    # logger.info("Formatting glow to SMR")
     # Convert the number to a float and then format it with 2 decimal places
     formatted_value = '{:.2f}'.format(float(value) / 1000000)
     return formatted_value
+
+
+async def generate_discord_timestamp():
+    current_time = datetime.datetime.now()
+    # Convert current time to UNIX timestamp
+    unix_timestamp = int(current_time.timestamp())
+    # Format the current time in Discord timestamp format
+    timestamp = current_time.strftime(f'<t:{unix_timestamp}:f>')
+    return timestamp
