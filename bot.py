@@ -250,7 +250,7 @@ async def on_command_error(context: Context, error) -> None:
             description=f"**Please slow down** - You can use this command again in {f'{round(hours)} hours' if round(hours) > 0 else ''} {f'{round(minutes)} minutes' if round(minutes) > 0 else ''} {f'{round(seconds)} seconds' if round(seconds) > 0 else ''}.",
             color=0xE02B2B,
         )
-        await context.send(embed=embed)
+        await context.send(embed=embed, ephemeral=True)
     elif isinstance(error, exceptions.UserBlacklisted):
         """
         The code here will only execute if the error is an instance of 'UserBlacklisted', which can occur when using
@@ -275,7 +275,7 @@ async def on_command_error(context: Context, error) -> None:
         embed = discord.Embed(
             description="You are not the owner of the bot!", color=0xE02B2B
         )
-        await context.send(embed=embed)
+        await context.send(embed=embed, ephemeral=True)
         if context.guild:
             bot.logger.warning(
                 f"{context.author} (ID: {context.author.id}) tried to execute an owner only command in the guild {context.guild.name} (ID: {context.guild.id}), but the user is not an owner of the bot."
@@ -291,7 +291,7 @@ async def on_command_error(context: Context, error) -> None:
             + "` to execute this command!",
             color=0xE02B2B,
         )
-        await context.send(embed=embed)
+        await context.send(embed=embed, ephemeral=True)
     elif isinstance(error, commands.BotMissingPermissions):
         embed = discord.Embed(
             description="I am missing the permission(s) `"
@@ -299,7 +299,7 @@ async def on_command_error(context: Context, error) -> None:
             + "` to fully perform this command!",
             color=0xE02B2B,
         )
-        await context.send(embed=embed)
+        await context.send(embed=embed, ephemeral=True)
     elif isinstance(error, commands.MissingRequiredArgument):
         embed = discord.Embed(
             title="Error!",
@@ -307,7 +307,7 @@ async def on_command_error(context: Context, error) -> None:
             description=str(error).capitalize(),
             color=0xE02B2B,
         )
-        await context.send(embed=embed)
+        await context.send(embed=embed, ephemeral=True)
     else:
         raise error
 
