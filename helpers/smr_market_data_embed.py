@@ -96,7 +96,7 @@ async def build_embed():
         # Create an embed instance
         embed = discord.Embed(title="Shimmer Market Data", color=0x00FF00)
         embed.add_field(name="Price (Coingecko)", value=f"{await format_currency(coingecko_data['usd_price'])}", inline=False)
-        embed.add_field(name="24h Volume (Coingecko)", value=f"{await format_currency(coingecko_data['total_volume'])}", inline=False)
+        embed.add_field(name="24h Volume (Bitfinex)", value=f"{await format_currency(coingecko_data['total_volume'])}", inline=False)
         embed.add_field(name="\u200b", value="\u200b", inline=False)
         embed.add_field(name="Defi Data", value="\u200b", inline=False)
         embed.add_field(name="Shimmer Rank (DefiLlama)", value=shimmer_rank, inline=True)
