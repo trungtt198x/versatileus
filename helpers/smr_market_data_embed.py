@@ -41,58 +41,58 @@ async def build_embed():
         total_defi_tx_24h = geckoterminal_data["total_defi_tx_24h"]
         shimmer_rank = defillama_data["shimmer_rank"]
         discord_timestamp = await generate_discord_timestamp()
-"""
+
         # Set up Bitfinex order book depth
-        bitfinex_order_book_data = await calculate_total_bitfinex_depth(coingecko_data['usd_price'])
-        logger.debug("Final bitfinex_order_book_data: %s", bitfinex_order_book_data)
+        # bitfinex_order_book_data = await calculate_total_bitfinex_depth(coingecko_data['usd_price'])
+        # logger.debug("Final bitfinex_order_book_data: %s", bitfinex_order_book_data)
 
 
-        positive_order_book_depth_str_2_percent = ""
-        negative_order_book_depth_str_2_percent = ""
-        positive_order_book_depth_str_5_percent = ""
-        negative_order_book_depth_str_5_percent = ""
-        positive_order_book_depth_str_10_percent = ""
-        negative_order_book_depth_str_10_percent = ""
-        positive_order_book_depth_str_20_percent = ""
-        negative_order_book_depth_str_20_percent = ""
+        # positive_order_book_depth_str_2_percent = ""
+        # negative_order_book_depth_str_2_percent = ""
+        # positive_order_book_depth_str_5_percent = ""
+        # negative_order_book_depth_str_5_percent = ""
+        # positive_order_book_depth_str_10_percent = ""
+        # negative_order_book_depth_str_10_percent = ""
+        # positive_order_book_depth_str_20_percent = ""
+        # negative_order_book_depth_str_20_percent = ""
 
 
-        # Iterate through the order book data and format the strings
-        for percentage, data in bitfinex_order_book_data['total_order_book_depth'].items():
+        # # Iterate through the order book data and format the strings
+        # for percentage, data in bitfinex_order_book_data['total_order_book_depth'].items():
 
-            # Format the 'buy' data using format_currency() function
-            if 'buy' in data:
-                formatted_buy_data = await format_currency(data['buy'], "SMR")
-                buy_data = f"Buy: {formatted_buy_data}\n\n"
-            else:
-                logger.error(f"Missing 'buy' key for percentage level {percentage}")
+        #     # Format the 'buy' data using format_currency() function
+        #     if 'buy' in data:
+        #         formatted_buy_data = await format_currency(data['buy'], "SMR")
+        #         buy_data = f"Buy: {formatted_buy_data}\n\n"
+        #     else:
+        #         logger.error(f"Missing 'buy' key for percentage level {percentage}")
 
-            # Format the 'sell' data using format_currency() function
-            if 'sell' in data:
-                formatted_sell_data = await format_currency(data['sell'], "SMR")
-                sell_data = f"Sell: {formatted_sell_data}\n\n"
-            else:
-                logger.error(f"Missing 'sell' key for percentage level {percentage}")
+        #     # Format the 'sell' data using format_currency() function
+        #     if 'sell' in data:
+        #         formatted_sell_data = await format_currency(data['sell'], "SMR")
+        #         sell_data = f"Sell: {formatted_sell_data}\n\n"
+        #     else:
+        #         logger.error(f"Missing 'sell' key for percentage level {percentage}")
 
-            buy_sell_info = f"**{percentage}**:\n{buy_data if percentage.startswith('-') else sell_data}"
+        #     buy_sell_info = f"**{percentage}**:\n{buy_data if percentage.startswith('-') else sell_data}"
 
-            if int(percentage[:-1]) == -2:
-                negative_order_book_depth_str_2_percent += buy_sell_info
-            elif int(percentage[:-1]) == -5:
-                negative_order_book_depth_str_5_percent += buy_sell_info
-            elif int(percentage[:-1]) == -10:
-                negative_order_book_depth_str_10_percent += buy_sell_info
-            elif int(percentage[:-1]) == -20:
-                negative_order_book_depth_str_20_percent += buy_sell_info
-            elif int(percentage[:-1]) == 2:
-                positive_order_book_depth_str_2_percent += buy_sell_info
-            elif int(percentage[:-1]) == 5:
-                positive_order_book_depth_str_5_percent += buy_sell_info
-            elif int(percentage[:-1]) == 10:
-                positive_order_book_depth_str_10_percent += buy_sell_info
-            elif int(percentage[:-1]) == 20:
-                positive_order_book_depth_str_20_percent += buy_sell_info
-"""
+        #     if int(percentage[:-1]) == -2:
+        #         negative_order_book_depth_str_2_percent += buy_sell_info
+        #     elif int(percentage[:-1]) == -5:
+        #         negative_order_book_depth_str_5_percent += buy_sell_info
+        #     elif int(percentage[:-1]) == -10:
+        #         negative_order_book_depth_str_10_percent += buy_sell_info
+        #     elif int(percentage[:-1]) == -20:
+        #         negative_order_book_depth_str_20_percent += buy_sell_info
+        #     elif int(percentage[:-1]) == 2:
+        #         positive_order_book_depth_str_2_percent += buy_sell_info
+        #     elif int(percentage[:-1]) == 5:
+        #         positive_order_book_depth_str_5_percent += buy_sell_info
+        #     elif int(percentage[:-1]) == 10:
+        #         positive_order_book_depth_str_10_percent += buy_sell_info
+        #     elif int(percentage[:-1]) == 20:
+        #         positive_order_book_depth_str_20_percent += buy_sell_info
+
         # Create an embed instance
         embed = discord.Embed(title="Shimmer Market Data", color=0x00FF00)
         embed.add_field(name="Price (Coingecko)", value=f"{await format_currency(coingecko_data['usd_price'])}", inline=False)
