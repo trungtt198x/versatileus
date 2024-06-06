@@ -1,7 +1,7 @@
 """"
 Copyright © antonionardella 2023 - https://github.com/antonionardella (https://antonionardella.it)
 Description:
-Shimmer market data
+IOTA market data
 
 Version: 5.5.0
 """
@@ -32,13 +32,13 @@ class Tokens(commands.Cog, name="tokens"):
     @commands.cooldown(1, 360, commands.BucketType.user)
     @commands.hybrid_command(
         name="smr-market",
-        description="Shares the Shimmer market data",
+        description="Shares the IOTA market data",
     )
     # This will only allow non-blacklisted members to execute the command
     @checks.not_blacklisted()
     async def shimmer_market_data(self, context: Context) -> None:
         """
-        This command prints an embed with the Shimmer Market data
+        This command prints an embed with the IOTA Market data
 
         :param context: The application command context.
         """
@@ -61,19 +61,19 @@ class Tokens(commands.Cog, name="tokens"):
     @commands.cooldown(1, 360, commands.BucketType.user)
     @commands.hybrid_command(
         name="updatesmd",
-        description="Force updates the Shimmer market data (Admin only)",
+        description="Force updates the IOTA market data (Admin only)",
     )
     # This will only allow owners to execute the command
     @checks.is_owner()
     async def updatesmd(self, context: Context) -> None:
         """
-        This command forces an update of Shimmer Market data
+        This command forces an update of IOTA Market data
 
         :param context: The application command context.
         """
         try:
             await context.send(
-                "Hello! Shimmer Market Data update launced...", ephemeral=True
+                "Hello! IOTA Market Data update launced...", ephemeral=True
             )
             await build_embed()
 
@@ -81,7 +81,7 @@ class Tokens(commands.Cog, name="tokens"):
             print(traceback.format_exc())
 
         await context.send(
-                "Hello! Shimmer Market Data update finished.", ephemeral=True
+                "Hello! IOTA Market Data update finished.", ephemeral=True
             )
 
 # And then we finally add the cog to the bot so that it can load, unload, reload and use it's content.

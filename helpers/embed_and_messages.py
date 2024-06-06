@@ -1,7 +1,7 @@
 """"
 Copyright © antonionardella 2023 - https://github.com/antonionardella (https://linkfree.antonionardella.it)
 Description:
-This file contains functions for the Shimmer data
+This file contains functions for the IOTA data
 
 Version: 5.4
 """
@@ -11,7 +11,7 @@ import discord
 
 
 async def create_empty_embed_and_messages():
-    embed = discord.Embed(title="Shimmer Market Data", color=0x00FF00)
+    embed = discord.Embed(title="IOTA Market Data", color=0x00FF00)
 
     embed.add_field(name="Updates: ", value="Every 24h")
     embed.add_field(

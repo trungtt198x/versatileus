@@ -1,7 +1,7 @@
 """"
 Copyright © antonionardella 2023 - https://github.com/antonionardella (https://antonionardella.it)
 Description:
-Get API data for Shimmer from GeckoTerminal API
+Get API data for IOTA from GeckoTerminal API
 Version: 5.5.0
 """
 import requests
@@ -13,18 +13,18 @@ logger = logging.getLogger("discord_bot")
 # Load configuration
 config = configuration_manager.load_config('config.json')
 
-# Shimmer data
+# IOTA data
 geckoterminal_ticker = config["geckoterminal_ticker"]
 
 
 async def get_geckoterminal_data():
     """
-    Get GeckoTerminal Defi Volume data for ShimmerEVM.
+    Get GeckoTerminal Defi Volume data for IOTA EVM.
 
     Returns:
-        dict: Dictionary containing ShimmerEVM's total 24h volume and total 24h transactions.
+        dict: Dictionary containing IOTA EVM's total 24h volume and total 24h transactions.
     """
-    logger.info("Getting GeckoTerminal Defi Volume data for ShimmerEVM")
+    logger.info("Getting GeckoTerminal Defi Volume data for IOTA EVM")
     geckoterminal_url = f"https://api.geckoterminal.com/api/v2/networks/{geckoterminal_ticker}/pools"
     headers = {"accept": "application/json"}
     total_defi_volume_usd_h24 = 0
@@ -54,12 +54,12 @@ async def get_geckoterminal_data():
                     total_defi_tx_24h += buys_h24 + sells_h24
 
                 logger.debug("Total USD 24h Volume for all pools: %s", total_defi_volume_usd_h24)
-                logger.debug("Total 24h Defi Transactions for ShimmerEVM: %s", total_defi_tx_24h)
+                logger.debug("Total 24h Defi Transactions for IOTA EVM: %s", total_defi_tx_24h)
 
                 if total_defi_volume_usd_h24 > 0 and total_defi_tx_24h > 0:
                     return {"defi_total_volume": total_defi_volume_usd_h24, "total_defi_tx_24h": total_defi_tx_24h}
                 else:
-                    logger.debug("Shimmer Total Volume or Total Transactions not found in the response.")
+                    logger.debug("IOTA Total Volume or Total Transactions not found in the response.")
             elif defi_volume.status_code == 404:
                 logger.error("404 Client Error: Not Found for URL: %s", defi_volume.url)
             else:
