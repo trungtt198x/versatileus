@@ -1,7 +1,7 @@
 """"
 Copyright © antonionardella 2023 - https://github.com/antonionardella (https://antonionardella.it)
 Description:
-Get API data for Shimmer from DefiLlama API
+Get API data for IOTA from DefiLlama API
 Version: 5.5.0
 """
 import requests
@@ -15,15 +15,15 @@ config = configuration_manager.load_config('config.json')
 
 async def get_defillama_data():
     """
-    Get DefiLlama TVL data for ShimmerEVM.
+    Get DefiLlama TVL data for IOTA EVM.
     
     Returns:
-        dict: Dictionary containing ShimmerEVM TVL and rank.
+        dict: Dictionary containing IOTA EVM TVL and rank.
     """
     logger.info("Getting the DefiLlama TVL and rank")
     defillama_url = "https://api.llama.fi/v2/chains"
     headers = {"accept": "*/*"}
-    shimmer_tvl = None
+    iota_tvl = None
     rank = None
 
     try:
@@ -33,17 +33,17 @@ async def get_defillama_data():
         
         if tvl_response.status_code == 200:
             tvl_data = tvl_response.json()
-            shimmer_entry = next((entry for entry in tvl_data if entry.get("name") == "ShimmerEVM"), None)
+            iota_entry = next((entry for entry in tvl_data if entry.get("name") == "IOTA EVM"), None)
             
-            if shimmer_entry:
-                shimmer_tvl = shimmer_entry.get("tvl")
+            if iota_entry:
+                iota_tvl = iota_entry.get("tvl")
                 tvl_data.sort(key=lambda x: x.get("tvl", 0), reverse=True)
-                rank = tvl_data.index(shimmer_entry) + 1
+                rank = tvl_data.index(iota_entry) + 1
 
-                logger.debug("Shimmer TVL Value: %s", shimmer_tvl)
-                logger.debug("Shimmer TVL Rank: %s", rank)
+                logger.debug("IOTA TVL Value: %s", iota_tvl)
+                logger.debug("IOTA TVL Rank: %s", rank)
                 
-        return {"shimmer_tvl": shimmer_tvl, "shimmer_rank": rank}
+        return {"iota_tvl": iota_tvl, "iota_rank": rank}
 
     except requests.exceptions.Timeout:
         logger.error("DefiLlama API request timed out.")

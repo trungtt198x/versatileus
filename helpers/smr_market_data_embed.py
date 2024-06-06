@@ -41,7 +41,7 @@ async def build_embed():
         total_defi_tx_24h = geckoterminal_data["total_defi_tx_24h"]
         shimmer_rank = defillama_data["shimmer_rank"]
         discord_timestamp = await generate_discord_timestamp()
-
+"""
         # Set up Bitfinex order book depth
         bitfinex_order_book_data = await calculate_total_bitfinex_depth(coingecko_data['usd_price'])
         logger.debug("Final bitfinex_order_book_data: %s", bitfinex_order_book_data)
@@ -55,6 +55,7 @@ async def build_embed():
         negative_order_book_depth_str_10_percent = ""
         positive_order_book_depth_str_20_percent = ""
         negative_order_book_depth_str_20_percent = ""
+
 
         # Iterate through the order book data and format the strings
         for percentage, data in bitfinex_order_book_data['total_order_book_depth'].items():
@@ -91,7 +92,7 @@ async def build_embed():
                 positive_order_book_depth_str_10_percent += buy_sell_info
             elif int(percentage[:-1]) == 20:
                 positive_order_book_depth_str_20_percent += buy_sell_info
-
+"""
         # Create an embed instance
         embed = discord.Embed(title="Shimmer Market Data", color=0x00FF00)
         embed.add_field(name="Price (Coingecko)", value=f"{await format_currency(coingecko_data['usd_price'])}", inline=False)
@@ -104,15 +105,15 @@ async def build_embed():
         embed.add_field(name="24h DeFi Transactions (GeckoTerminal)", value=total_defi_tx_24h, inline=True)
         embed.add_field(name="24h DeFi Volume (GeckoTerminal)", value=f"{await format_currency(geckoterminal_data['defi_total_volume'])}", inline=True)
         embed.add_field(name="\u200b", value="\u200b", inline=False)
-        embed.add_field(name="ShimmerEVM Order Books", value="\u200b", inline=False)
-        embed.add_field(name="Order Book depth ±2%", value=f"{negative_order_book_depth_str_2_percent} {positive_order_book_depth_str_2_percent}", inline=True)
-        embed.add_field(name="\u200b", value="\u200b", inline=False)
-        embed.add_field(name="Order Book depth ±5%", value=f"{negative_order_book_depth_str_5_percent} {positive_order_book_depth_str_5_percent}", inline=True)
-        embed.add_field(name="\u200b", value="\u200b", inline=False)
-        embed.add_field(name="Order Book depth ±10%", value=f"{negative_order_book_depth_str_10_percent} {positive_order_book_depth_str_10_percent}", inline=True)
-        embed.add_field(name="\u200b", value="\u200b", inline=False)
-        embed.add_field(name="Order Book depth ±20%", value=f"{negative_order_book_depth_str_20_percent} {positive_order_book_depth_str_20_percent}", inline=True)
-        embed.add_field(name="\u200b", value="\u200b", inline=False)
+        # embed.add_field(name="ShimmerEVM Order Books", value="\u200b", inline=False)
+        # embed.add_field(name="Order Book depth ±2%", value=f"{negative_order_book_depth_str_2_percent} {positive_order_book_depth_str_2_percent}", inline=True)
+        # embed.add_field(name="\u200b", value="\u200b", inline=False)
+        # embed.add_field(name="Order Book depth ±5%", value=f"{negative_order_book_depth_str_5_percent} {positive_order_book_depth_str_5_percent}", inline=True)
+        # embed.add_field(name="\u200b", value="\u200b", inline=False)
+        # embed.add_field(name="Order Book depth ±10%", value=f"{negative_order_book_depth_str_10_percent} {positive_order_book_depth_str_10_percent}", inline=True)
+        # embed.add_field(name="\u200b", value="\u200b", inline=False)
+        # embed.add_field(name="Order Book depth ±20%", value=f"{negative_order_book_depth_str_20_percent} {positive_order_book_depth_str_20_percent}", inline=True)
+        # embed.add_field(name="\u200b", value="\u200b", inline=False)
 
         # Add additional information
         embed.add_field(name="Sources", value="Bitfinex, Coingecko, DefiLlama, GeckoTerminal, Shimmer API", inline=False)
