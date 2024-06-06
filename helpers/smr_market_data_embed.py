@@ -39,7 +39,7 @@ async def build_embed():
         # geckoterminal_data = await get_geckoterminal_data()
         shimmer_data = await get_shimmer_data()
         # total_defi_tx_24h = geckoterminal_data["total_defi_tx_24h"]
-        shimmer_rank = defillama_data["shimmer_rank"]
+        iota_rank = defillama_data["iota_rank"]
         discord_timestamp = await generate_discord_timestamp()
 
         # Set up Bitfinex order book depth
@@ -99,9 +99,9 @@ async def build_embed():
         embed.add_field(name="24h Volume (Bitfinex)", value=f"{await format_currency(coingecko_data['total_volume'])}", inline=False)
         embed.add_field(name="\u200b", value="\u200b", inline=False)
         embed.add_field(name="Defi Data", value="\u200b", inline=False)
-        embed.add_field(name="Shimmer Rank (DefiLlama)", value=shimmer_rank, inline=True)
+        embed.add_field(name="Shimmer Rank (DefiLlama)", value=iota_rank, inline=True)
         embed.add_field(name="Shimmer Onchain Amount (Shimmer API)", value=f"{await format_currency(await format_shimmer_amount(shimmer_data['shimmer_onchain_token_amount']), 'SMR')}", inline=True)
-        embed.add_field(name="Total Value Locked (DefiLlama)", value=f"{await format_currency(defillama_data['shimmer_tvl'])}", inline=True)
+        embed.add_field(name="Total Value Locked (DefiLlama)", value=f"{await format_currency(defillama_data['iota_tvl'])}", inline=True)
         # embed.add_field(name="24h DeFi Transactions (GeckoTerminal)", value=total_defi_tx_24h, inline=True)
         # embed.add_field(name="24h DeFi Volume (GeckoTerminal)", value=f"{await format_currency(geckoterminal_data['defi_total_volume'])}", inline=True)
         embed.add_field(name="\u200b", value="\u200b", inline=False)
