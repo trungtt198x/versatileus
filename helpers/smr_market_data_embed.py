@@ -94,13 +94,13 @@ async def build_embed():
         #         positive_order_book_depth_str_20_percent += buy_sell_info
 
         # Create an embed instance
-        embed = discord.Embed(title="Shimmer Market Data", color=0x00FF00)
+        embed = discord.Embed(title="IOTA Market Data", color=0x00FF00)
         embed.add_field(name="Price (Coingecko)", value=f"{await format_currency(coingecko_data['usd_price'])}", inline=False)
         embed.add_field(name="24h Volume (Bitfinex)", value=f"{await format_currency(coingecko_data['total_volume'])}", inline=False)
         embed.add_field(name="\u200b", value="\u200b", inline=False)
         embed.add_field(name="Defi Data", value="\u200b", inline=False)
-        embed.add_field(name="Shimmer Rank (DefiLlama)", value=iota_rank, inline=True)
-        embed.add_field(name="Shimmer Onchain Amount (Shimmer API)", value=f"{await format_currency(await format_shimmer_amount(shimmer_data['shimmer_onchain_token_amount']), 'SMR')}", inline=True)
+        embed.add_field(name="IOTA Rank (DefiLlama)", value=iota_rank, inline=True)
+        # embed.add_field(name="IOTA Onchain Amount (Shimmer API)", value=f"{await format_currency(await format_shimmer_amount(shimmer_data['shimmer_onchain_token_amount']), 'SMR')}", inline=True)
         embed.add_field(name="Total Value Locked (DefiLlama)", value=f"{await format_currency(defillama_data['iota_tvl'])}", inline=True)
         # embed.add_field(name="24h DeFi Transactions (GeckoTerminal)", value=total_defi_tx_24h, inline=True)
         # embed.add_field(name="24h DeFi Volume (GeckoTerminal)", value=f"{await format_currency(geckoterminal_data['defi_total_volume'])}", inline=True)
@@ -116,7 +116,7 @@ async def build_embed():
         # embed.add_field(name="\u200b", value="\u200b", inline=False)
 
         # Add additional information
-        embed.add_field(name="Sources", value="Bitfinex, Coingecko, DefiLlama, GeckoTerminal, Shimmer API", inline=False)
+        embed.add_field(name="Sources", value="Bitfinex, Coingecko, DefiLlama, GeckoTerminal, IOTA API", inline=False)
         embed.add_field(name="Last Data Update", value=f"{discord_timestamp}", inline=False)
         embed.set_footer(text="Data updated every 24h\nMade with IOTA-❤️ by Antonio\nOut of beta SOON™")
 
