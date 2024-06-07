@@ -16,6 +16,7 @@ config = configuration_manager.load_config('config.json')
 # IOTA data
 coingecko_coin_id = config["coingecko_coin_id"]
 coingecko_exchange_id = config["coingecko_exchange_id"]
+coingecko_api_key = config["coingecko_api_key"]
 
 
 async def get_coingecko_exchange_data():
@@ -48,6 +49,42 @@ async def get_coingecko_exchange_data():
             logger.debug("Total USD Converted Volume for IOTA: %s", twentyfourh_volume)
 
             return {"usd_price": usd_price, "total_volume": twentyfourh_volume}
+
+        else:
+            logger.debug("Error: Unable to fetch data from the API.")
+
+    except requests.exceptions.Timeout:
+        logger.error("Coingecko API request timed out.")
+    except requests.exceptions.HTTPError as errh:
+        logger.error("HTTP Error occurred: %s", errh)
+    except requests.exceptions.RequestException as err:
+        logger.error("Request Exception occurred: %s", err)
+
+async def get_coingecko_24h_trading_volume():
+    """
+    Get Coingecko 24h trading volume for IOTA cryptocurrency.
+
+    Returns:
+        dict: A dictionary containing the 24h trading volume for IOTA.
+
+    Raises:
+        requests.exceptions.RequestException: If there is an issue with the HTTP request to the Coingecko API.
+    """
+    logger.info("Getting Coingecko 24h trading volume")
+    coingecko_exchange_url = f"https://api.coingecko.com/api/v3/simple/price?ids={coingecko_coin_id}&vs_currencies=usd&include_24hr_vol=true"
+    headers = {"accept": "application/json", "x-cg-demo-api-key": coingecko_api_key}
+
+    try:
+        coingecko_response = requests.get(coingecko_exchange_url, headers=headers, timeout=10)
+        coingecko_response.raise_for_status()  # Raise HTTPError for bad requests (4xx and 5xx status codes)
+        logger.debug("Coingecko 24h trading volume response: %s", coingecko_response.text)
+
+        if coingecko_response.status_code == 200:
+            coingecko_response_data = coingecko_response.json().get(coingecko_coin_id, {})
+            usd_24h_vol = coingecko_response_data["usd_24h_vol"]
+            logger.debug("usd_24h_vol: %s", usd_24h_vol)
+
+            return usd_24h_vol
 
         else:
             logger.debug("Error: Unable to fetch data from the API.")

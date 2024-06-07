@@ -14,6 +14,7 @@ import helpers.configuration_manager as configuration_manager
 from helpers.formatting import format_currency, format_shimmer_amount, generate_discord_timestamp
 from helpers.smr_market_data.smd_bitfinex import calculate_total_bitfinex_depth
 from helpers.smr_market_data.smd_coingecko import get_coingecko_exchange_data
+from helpers.smr_market_data.smd_coingecko import get_coingecko_24h_trading_volume
 from helpers.smr_market_data.smd_shimmer import get_shimmer_data
 from helpers.smr_market_data.smd_geckoterminal import get_geckoterminal_data
 from helpers.smr_market_data.smd_defillama import get_defillama_data
@@ -35,6 +36,7 @@ async def build_embed():
         # Get data from API calls
         # current_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
         coingecko_data = await get_coingecko_exchange_data()
+        coingecko_24h_vol = await get_coingecko_24h_trading_volume()
         defillama_data = await get_defillama_data()
         # geckoterminal_data = await get_geckoterminal_data()
         shimmer_data = await get_shimmer_data()
@@ -96,7 +98,8 @@ async def build_embed():
         # Create an embed instance
         embed = discord.Embed(title="IOTA Market Data", color=0x00FF00)
         embed.add_field(name="Price (Coingecko)", value=f"{await format_currency(coingecko_data['usd_price'])}", inline=False)
-        embed.add_field(name="24h Volume (Bitfinex)", value=f"{await format_currency(coingecko_data['total_volume'])}", inline=False)
+        # embed.add_field(name="24h Volume (Bitfinex)", value=f"{await format_currency(coingecko_data['total_volume'])}", inline=False)
+        embed.add_field(name="24h Volume (Coingecko)", value=f"{await format_currency(coingecko_24h_vol)}", inline=False)
         embed.add_field(name="\u200b", value="\u200b", inline=False)
         embed.add_field(name="Defi Data", value="\u200b", inline=False)
         embed.add_field(name="IOTA Rank (DefiLlama)", value=iota_rank, inline=True)
