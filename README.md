@@ -52,7 +52,7 @@ Here is an explanation of what everything is:
 | application_id            | The application ID of your bot                                        |
 | owners                    | The user ID of all the bot owners                                     |
 | dc_bot_channel            | The channel ID of the dcounter.space bot logs                         |
-| bot_reply_channel         | The channel ID of the `/smr-market` command reply channel                      |
+| bot_reply_channel         | The channel ID of the `/iota-market` command reply channel                      |
 | tea_comms_channel         | The channel ID of the `/talktotea` command                            |
 | unverified_role_name      | Human readable dcounter.space @Unverified group name                  |
 | unverified_role_id        | The group ID of the dcounter.space @Unverified group                  |
