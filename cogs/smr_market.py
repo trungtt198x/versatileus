@@ -31,9 +31,8 @@ class Tokens(commands.Cog, name="tokens"):
 
     @commands.cooldown(1, 360, commands.BucketType.user)
     @commands.hybrid_command(
-        name="smr-market",
+        name="iota-market",
         description="Shares the IOTA market data",
-        with_app_command=True,
     )
     # This will only allow non-blacklisted members to execute the command
     @checks.not_blacklisted()
