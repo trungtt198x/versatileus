@@ -23,7 +23,7 @@ bot_reply_channel_id = config["bot_reply_channel"]
 
 
 # Here we name the cog and create a new class for the cog.
-class Tokens(commands.Cog, name="tokens"):
+class TokenIOTAs(commands.Cog, name="tokenIOTAs"):
     def __init__(self, bot):
         self.bot = bot
 
@@ -31,7 +31,7 @@ class Tokens(commands.Cog, name="tokens"):
 
     @commands.cooldown(1, 360, commands.BucketType.user)
     @commands.hybrid_command(
-        name="smr-market",
+        name="iota-market",
         description="Shares the IOTA market data",
         with_app_command=True,
     )
@@ -61,12 +61,12 @@ class Tokens(commands.Cog, name="tokens"):
 
     @commands.cooldown(1, 360, commands.BucketType.user)
     @commands.hybrid_command(
-        name="updatesmd",
+        name="updateiotad",
         description="Force updates the IOTA market data (Admin only)",
     )
     # This will only allow owners to execute the command
     @checks.is_owner()
-    async def updatesmd(self, context: Context) -> None:
+    async def updateiotad(self, context: Context) -> None:
         """
         This command forces an update of IOTA Market data
 
@@ -87,4 +87,4 @@ class Tokens(commands.Cog, name="tokens"):
 
 # And then we finally add the cog to the bot so that it can load, unload, reload and use it's content.
 async def setup(bot):
-    await bot.add_cog(Tokens(bot))
+    await bot.add_cog(TokenIOTAs(bot))
