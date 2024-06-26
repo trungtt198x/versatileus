@@ -10,6 +10,7 @@ import discord
 import datetime
 import pickle
 import traceback
+import requests
 import helpers.configuration_manager as configuration_manager
 from helpers.formatting import format_currency, format_shimmer_amount, generate_discord_timestamp
 from helpers.smr_market_data.smd_bitfinex import calculate_total_bitfinex_depth
@@ -24,6 +25,8 @@ logger = logging.getLogger("discord_bot")
 
 # Load configuration
 config = configuration_manager.load_config('config.json')
+
+slack_channel = config["slack_channel"]
 
 # Functions
 async def build_embed():
@@ -97,13 +100,23 @@ async def build_embed():
 
         # Create an embed instance
         embed = discord.Embed(title="IOTA Market Data", color=0x00FF00)
-        embed.add_field(name="Price (Coingecko)", value=f"{await format_currency(coingecko_data['usd_price'])}", inline=False)
+        slack_data = "IOTA Market Data\n"
+
+        coin_gecko_usd_price = await format_currency(coingecko_data['usd_price'])
+        embed.add_field(name="Price (Coingecko)", value=f"{coin_gecko_usd_price}", inline=False)
+        slack_data += "Price (Coingecko)\n"
+        slack_data += coin_gecko_usd_price
+
         # embed.add_field(name="24h Volume (Bitfinex)", value=f"{await format_currency(coingecko_data['total_volume'])}", inline=False)
         embed.add_field(name="24h Volume (Coingecko)", value=f"{await format_currency(coingecko_24h_vol)}", inline=False)
         embed.add_field(name="\u200b", value="\u200b", inline=False)
         embed.add_field(name="Defi Data", value="\u200b", inline=False)
         embed.add_field(name="IOTA Rank (DefiLlama)", value=iota_rank, inline=True)
-        embed.add_field(name="IOTA on-chain amount (IOTA API)", value=f"{await format_currency(await format_shimmer_amount(shimmer_data['shimmer_onchain_token_amount']), 'IOTA')}", inline=True)
+        try:
+            embed.add_field(name="IOTA on-chain amount (IOTA API)", value=f"{await format_currency(await format_shimmer_amount(shimmer_data['shimmer_onchain_token_amount']), 'IOTA')}", inline=True)
+        except Exception:
+            logger.info(traceback.format_exc())
+
         embed.add_field(name="Total Value Locked (DefiLlama)", value=f"{await format_currency(defillama_data['iota_tvl'])}", inline=True)
         # embed.add_field(name="24h DeFi Transactions (GeckoTerminal)", value=total_defi_tx_24h, inline=True)
         # embed.add_field(name="24h DeFi Volume (GeckoTerminal)", value=f"{await format_currency(geckoterminal_data['defi_total_volume'])}", inline=True)
@@ -127,6 +140,12 @@ async def build_embed():
         with open("assets/embed_shimmer_market_data.pkl", "wb") as f:
             pickle.dump(embed, f)
 
+        # Write to slack channel
+        # Must have double quotes around slack_data
+        slack_data = '{"text": ' + '"' + slack_data + '"' + '}'
+        logger.info(slack_data)
+        res = requests.post(url=slack_channel, data=slack_data)
+        logger.info(res)
     except Exception:
         logger.info(traceback.format_exc())
 
