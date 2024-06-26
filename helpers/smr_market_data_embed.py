@@ -127,8 +127,6 @@ async def build_embed():
         with open("assets/embed_shimmer_market_data.pkl", "wb") as f:
             pickle.dump(embed, f)
 
-        await context.send(embed=embed)
-
     except Exception:
         logger.info(traceback.format_exc())
 
