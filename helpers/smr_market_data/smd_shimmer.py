@@ -28,7 +28,7 @@ async def get_shimmer_data():
     headers = {"accept": "application/json"}
 
     try:
-        shimmer_api_response = requests.get(shimmer_explorer_api_url, headers=headers, timeout=10)
+        shimmer_api_response = requests.get(shimmer_explorer_api_url, headers=headers, timeout=100)
         shimmer_api_response.raise_for_status()
         logger.debug("IOTA Explorer API response: %s", shimmer_api_response.text)
 

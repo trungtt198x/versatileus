@@ -90,8 +90,8 @@ def background_task():
     """Launched background tasks"""
     bot.logger.info("Starting background tasks for the DLT ledger data")
     asyncio.run(smr_market_data_embed.main())
-    time.sleep(24 * 60 * 60)
-    background_task()
+    # time.sleep(24 * 60 * 60)
+    # background_task()
 
 
 def run_bot():
