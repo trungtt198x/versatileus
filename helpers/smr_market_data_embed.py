@@ -43,9 +43,10 @@ async def build_embed():
         coingecko_data = await get_coingecko_exchange_data()
         coingecko_24h_vol = await get_coingecko_24h_trading_volume()
         defillama_data = await get_defillama_data()
-        # geckoterminal_data = await get_geckoterminal_data()
+        geckoterminal_data = await get_geckoterminal_data()
         shimmer_data = await get_shimmer_data()
-        # total_defi_tx_24h = geckoterminal_data["total_defi_tx_24h"]
+        total_defi_tx_24h = geckoterminal_data["total_defi_tx_24h"]
+        defi_total_volume = geckoterminal_data['defi_total_volume']
         iota_rank = defillama_data["iota_rank"]
         discord_timestamp = await generate_discord_timestamp()
 
@@ -135,8 +136,13 @@ async def build_embed():
         embed.add_field(name="Total Value Locked (DefiLlama)", value=f"{my_iota_tvl}", inline=True)
         slack_data.append({"type": "section", "text": {"type": "mrkdwn", "text": "*Total Value Locked (DefiLlama)*\n" + str(my_iota_tvl) }})
 
-        # embed.add_field(name="24h DeFi Transactions (GeckoTerminal)", value=total_defi_tx_24h, inline=True)
-        # embed.add_field(name="24h DeFi Volume (GeckoTerminal)", value=f"{await format_currency(geckoterminal_data['defi_total_volume'])}", inline=True)
+        embed.add_field(name="24h DeFi Transactions (GeckoTerminal)", value=total_defi_tx_24h, inline=True)
+        slack_data.append({"type": "section", "text": {"type": "mrkdwn", "text": "*24h DeFi Transactions (GeckoTerminal)*\n" + str(total_defi_tx_24h) }})
+
+        my_defi_total_volume = await format_currency(defi_total_volume)
+        embed.add_field(name="24h DeFi Volume (GeckoTerminal)", value=f"{my_defi_total_volume}", inline=True)
+        slack_data.append({"type": "section", "text": {"type": "mrkdwn", "text": "*24h DeFi Volume (GeckoTerminal)*\n" + str(my_defi_total_volume) }})
+
         embed.add_field(name="\u200b", value="\u200b", inline=False)
         # slack_data.append({"type": "section", "text": {"type": "mrkdwn", "text": "\n" }})
         slack_data.append({"type": "divider"})
@@ -152,14 +158,15 @@ async def build_embed():
         # embed.add_field(name="\u200b", value="\u200b", inline=False)
 
         # Add additional information
-        my_source = "Bitfinex, Coingecko, DefiLlama, GeckoTerminal, IOTA API"
-        embed.add_field(name="Sources", value=f"{my_source}", inline=False)
-        slack_data.append({"type": "section", "text": {"type": "mrkdwn", "text": "*Sources*\n" + my_source }})
+        # my_source = "Bitfinex, Coingecko, DefiLlama, GeckoTerminal, IOTA API"
+        # embed.add_field(name="Sources", value=f"{my_source}", inline=False)
+        # slack_data.append({"type": "section", "text": {"type": "mrkdwn", "text": "*Sources*\n" + my_source }})
 
         embed.add_field(name="Last Data Update", value=f"{discord_timestamp}", inline=False)
         slack_data.append({"type": "section", "text": {"type": "mrkdwn", "text": "*Last Data Update*\n" + datetime.datetime.now().strftime("%d/%m/%Y %H:%M")}})
 
         embed.set_footer(text="Data updated every 24h\nMade with IOTA-❤️ by Holger and Mido")
+        # slack_data.append({"type": "divider"})
         slack_data.append({"type": "section", "text": {"type": "plain_text", "text": "Data updated every 24h\n" }})
 
         # Save the embed to a pickle file
