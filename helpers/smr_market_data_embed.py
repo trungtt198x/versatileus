@@ -122,8 +122,8 @@ async def build_embed():
         embed.add_field(name="DeFi Data", value="\u200b", inline=False)
         slack_data.append({"type": "section", "text": {"type": "mrkdwn", "text": "*DeFi Data*\n" }})
 
-        embed.add_field(name="IOTA Rank (DefiLlama)", value=iota_rank, inline=True)
-        slack_data.append({"type": "section", "text": {"type": "mrkdwn", "text": "*IOTA Rank (DefiLlama)*\n" + str(iota_rank) }})
+        embed.add_field(name="IOTA EVM Rank (DefiLlama)", value=iota_rank, inline=True)
+        slack_data.append({"type": "section", "text": {"type": "mrkdwn", "text": "*IOTA EVM Rank (DefiLlama)*\n" + str(iota_rank) }})
 
         try:
             my_shimmer_onchain_token_amount = await format_currency(await format_shimmer_amount(shimmer_data['shimmer_onchain_token_amount']), 'IOTA')
