@@ -13,6 +13,7 @@ import traceback
 import requests
 import json
 import datetime
+import os.path
 import helpers.configuration_manager as configuration_manager
 from helpers.formatting import format_currency, format_shimmer_amount, generate_discord_timestamp
 from helpers.smr_market_data.smd_bitfinex import calculate_total_bitfinex_depth
@@ -30,6 +31,151 @@ config = configuration_manager.load_config('config.json')
 
 slack_channel = config["slack_channel"]
 
+market_data_current_week_file_path = "assets/market_data_current_week.pkl"
+market_data_last_week_file_path = "assets/market_data_last_week.pkl"
+
+def get_market_data_last_week():
+    return {
+        # monday
+        0: {
+            "iota-price-coingecko": 0.17159,
+            "24h-volume-coingecko": 8582530.23,
+            "tvl-defilama": 341339.69,
+            "24h-defi-txs": 262,
+            "24h-defi-volume": 10271.84
+        },
+        # tuesday
+        1: {
+            "iota-price-coingecko": 0.16962,
+            "24h-volume-coingecko": 9395325.27,
+            "tvl-defilama": 338453.06,
+            "24h-defi-txs": 260,
+            "24h-defi-volume": 12556.71
+        },
+        # wednesday
+        2: {
+            "iota-price-coingecko": 0.16962,
+            "24h-volume-coingecko": 9395325.27,
+            "tvl-defilama": 338453.06,
+            "24h-defi-txs": 260,
+            "24h-defi-volume": 12556.71
+        },
+        # thursday
+        3: {
+            "iota-price-coingecko": 0.16962,
+            "24h-volume-coingecko": 9395325.27,
+            "tvl-defilama": 338453.06,
+            "24h-defi-txs": 260,
+            "24h-defi-volume": 12556.71
+        },
+        # friday
+        4: {
+            "iota-price-coingecko": 0.16962,
+            "24h-volume-coingecko": 9395325.27,
+            "tvl-defilama": 338453.06,
+            "24h-defi-txs": 260,
+            "24h-defi-volume": 12556.71
+        },
+        # saturday
+        5: {
+            "iota-price-coingecko": 0.16962,
+            "24h-volume-coingecko": 9395325.27,
+            "tvl-defilama": 338453.06,
+            "24h-defi-txs": 260,
+            "24h-defi-volume": 12556.71
+        },
+        # sunday
+        6: {
+            "iota-price-coingecko": 0.16962,
+            "24h-volume-coingecko": 9395325.27,
+            "tvl-defilama": 338453.06,
+            "24h-defi-txs": 260,
+            "24h-defi-volume": 12556.71
+        }
+    }
+
+def get_market_data_current_week():
+    return {
+        # monday
+        0: {
+            "iota-price-coingecko": 0.17159,
+            "24h-volume-coingecko": 8582530.23,
+            "tvl-defilama": 341339.69,
+            "24h-defi-txs": 262,
+            "24h-defi-volume": 10271.84
+        },
+        # tuesday
+        1: {
+            "iota-price-coingecko": 0.16962,
+            "24h-volume-coingecko": 9395325.27,
+            "tvl-defilama": 338453.06,
+            "24h-defi-txs": 260,
+            "24h-defi-volume": 12556.71
+        },
+        # wednesday
+        2: {
+            "iota-price-coingecko": 0.16915,
+            "24h-volume-coingecko": 10086899.93,
+            "tvl-defilama": 322733.01,
+            "24h-defi-txs": 472,
+            "24h-defi-volume": 24685.36
+        }
+    }
+
+def get_current_weekday():
+    today = datetime.datetime.today()
+    return today.weekday()
+
+def get_last_weekday():
+    today = datetime.datetime.today()
+    current_week_day = today.weekday() 
+    if (current_week_day == 0):
+        return 6
+    else:
+        return current_week_day - 1
+
+def calc_change_percent(current_value, last_day_value, last_week_value):
+    
+    current_value_float = float(current_value)
+    last_day_value_float = float(last_day_value)
+    last_week_value_float = float(last_week_value)
+
+    change_percent_daily = round((((current_value_float - last_day_value_float) / current_value_float) * 100), 2)
+    change_percent_weekly = round((((current_value_float - last_week_value_float) / current_value_float) * 100), 2)
+
+    return {
+        "daily": "Daily change: " + str(change_percent_daily) + " %",
+        "weekly": "Weekly change: " + str(change_percent_weekly) + " %" 
+    }
+
+# If not exist, 2 files of market data for current week and last week will be created with dump data
+def create_market_data_files():
+    past_data = get_market_data_current_week()
+    with open(market_data_current_week_file_path, "wb") as f:
+        pickle.dump(json.dumps(past_data), f)
+        f.close()
+
+    past_data = get_market_data_last_week()
+    with open(market_data_last_week_file_path, "wb") as f:
+        pickle.dump(json.dumps(past_data), f)
+        f.close()
+
+def get_market_data():
+    market_data_current_week = ""
+    with open(market_data_current_week_file_path, "rb") as f:
+        market_data_current_week = json.loads(pickle.load(f))
+        f.close()
+
+    market_data_last_week = ""
+    with open(market_data_last_week_file_path, "rb") as f:
+        market_data_last_week = json.loads(pickle.load(f))
+        f.close()
+
+    return {
+        "current_week": market_data_current_week,
+        "last_week": market_data_last_week
+    }
+
 # Functions
 async def build_embed():
     """
@@ -38,6 +184,20 @@ async def build_embed():
     logger.info("Building Discord embed message")
 
     try:
+        create_market_data_files()
+        current_weekday = str(get_current_weekday())
+        last_weekday = str(get_last_weekday())
+
+        market_data = get_market_data()
+        
+        market_data_current_week = market_data["current_week"]
+        market_data_last_week = market_data["current_week"]
+
+        logger.info(market_data_current_week)
+        logger.info(market_data_last_week)
+        logger.info(current_weekday)
+        logger.info(last_weekday)
+
         # Get data from API calls
         # current_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
         coingecko_data = await get_coingecko_exchange_data()
@@ -106,14 +266,26 @@ async def build_embed():
         slack_data = [{"type": "header", "text": {"type": "plain_text", "text": "IOTA Market Data"}}]
 
         my_coin_gecko_usd_price = await format_currency(coingecko_data['usd_price'])
+
+        current_value = coingecko_data['usd_price']
+        last_day_value = market_data_current_week[last_weekday]["iota-price-coingecko"]
+        last_week_value = market_data_last_week[current_weekday]["iota-price-coingecko"]
+        change_percent = calc_change_percent(current_value, last_day_value, last_week_value)
+
         embed.add_field(name="Price (Coingecko)", value=f"{my_coin_gecko_usd_price}", inline=False)
-        slack_data.append({"type": "section", "text": {"type": "mrkdwn", "text": "*Price (Coingecko)*\n" + my_coin_gecko_usd_price }})
+        slack_data.append({"type": "section", "text": {"type": "mrkdwn", "text": "*Price (Coingecko)*\n" + my_coin_gecko_usd_price + "\n" + change_percent["daily"] + "\n" + change_percent["weekly"]}})
 
         # embed.add_field(name="24h Volume (Bitfinex)", value=f"{await format_currency(coingecko_data['total_volume'])}", inline=False)
         
         my_coingecko_24h_vol = await format_currency(coingecko_24h_vol)
+
+        current_value = coingecko_24h_vol
+        last_day_value = market_data_current_week[last_weekday]["24h-volume-coingecko"]
+        last_week_value = market_data_last_week[current_weekday]["24h-volume-coingecko"]
+        change_percent = calc_change_percent(current_value, last_day_value, last_week_value)
+
         embed.add_field(name="24h Volume (Coingecko)", value=f"{my_coingecko_24h_vol}", inline=False)
-        slack_data.append({"type": "section", "text": {"type": "mrkdwn", "text": "*24h Volume (Coingecko)*\n" + my_coingecko_24h_vol }})
+        slack_data.append({"type": "section", "text": {"type": "mrkdwn", "text": "*24h Volume (Coingecko)*\n" + my_coingecko_24h_vol + "\n" + change_percent["daily"] + "\n" + change_percent["weekly"]}})
 
         embed.add_field(name="\u200b", value="\u200b", inline=False)
         # slack_data.append({"type": "section", "text": {"type": "mrkdwn", "text": "\n" }})
@@ -175,7 +347,7 @@ async def build_embed():
 
         # Post data to slack channel
         slack_data = '{"blocks": ' + json.dumps(slack_data) + '}'
-        # logger.info(slack_data)
+        logger.info(slack_data)
         res = requests.post(url=slack_channel, data=slack_data)
         # logger.info(res)
     except Exception:
