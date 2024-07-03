@@ -38,59 +38,59 @@ def get_market_data_last_week():
     return {
         # monday
         0: {
-            "iota-price-coingecko": 0.17159,
-            "24h-volume-coingecko": 8582530.23,
-            "tvl-defilama": 341339.69,
-            "24h-defi-txs": 262,
+            "iota-price-coingecko": 0.17112,
+            "24h-volume-coingecko": 15409685.01,
+            "tvl-defilama": 227364.37,
+            "24h-defi-txs": 249,
             "24h-defi-volume": 10271.84
         },
         # tuesday
         1: {
-            "iota-price-coingecko": 0.16962,
-            "24h-volume-coingecko": 9395325.27,
-            "tvl-defilama": 338453.06,
-            "24h-defi-txs": 260,
-            "24h-defi-volume": 12556.71
+            "iota-price-coingecko": 0.17112,
+            "24h-volume-coingecko": 15409685.01,
+            "tvl-defilama": 227364.37,
+            "24h-defi-txs": 249,
+            "24h-defi-volume": 10271.84
         },
         # wednesday
         2: {
-            "iota-price-coingecko": 0.16962,
-            "24h-volume-coingecko": 9395325.27,
-            "tvl-defilama": 338453.06,
-            "24h-defi-txs": 260,
-            "24h-defi-volume": 12556.71
+            "iota-price-coingecko": 0.17112,
+            "24h-volume-coingecko": 15409685.01,
+            "tvl-defilama": 227364.37,
+            "24h-defi-txs": 249,
+            "24h-defi-volume": 10271.84
         },
         # thursday
         3: {
-            "iota-price-coingecko": 0.16962,
-            "24h-volume-coingecko": 9395325.27,
-            "tvl-defilama": 338453.06,
-            "24h-defi-txs": 260,
-            "24h-defi-volume": 12556.71
+            "iota-price-coingecko": 0.17583,
+            "24h-volume-coingecko": 11092023.27,
+            "tvl-defilama": 357441.75,
+            "24h-defi-txs": 249,
+            "24h-defi-volume": 10556.71
         },
         # friday
         4: {
-            "iota-price-coingecko": 0.16962,
-            "24h-volume-coingecko": 9395325.27,
-            "tvl-defilama": 338453.06,
-            "24h-defi-txs": 260,
-            "24h-defi-volume": 12556.71
+            "iota-price-coingecko": 0.17721,
+            "24h-volume-coingecko": 11526929.93,
+            "tvl-defilama": 354708.34,
+            "24h-defi-txs": 116,
+            "24h-defi-volume": 11000
         },
         # saturday
         5: {
-            "iota-price-coingecko": 0.16962,
-            "24h-volume-coingecko": 9395325.27,
-            "tvl-defilama": 338453.06,
-            "24h-defi-txs": 260,
-            "24h-defi-volume": 12556.71
+            "iota-price-coingecko": 0.17249,
+            "24h-volume-coingecko": 10855710.61,
+            "tvl-defilama": 361149.08,
+            "24h-defi-txs": 199,
+            "24h-defi-volume": 10814.00
         },
         # sunday
         6: {
-            "iota-price-coingecko": 0.16962,
-            "24h-volume-coingecko": 9395325.27,
-            "tvl-defilama": 338453.06,
-            "24h-defi-txs": 260,
-            "24h-defi-volume": 12556.71
+            "iota-price-coingecko": 0.17117,
+            "24h-volume-coingecko": 6617140.13,
+            "tvl-defilama": 330935.81,
+            "24h-defi-txs": 160,
+            "24h-defi-volume": 3133.20
         }
     }
 
@@ -143,9 +143,17 @@ def calc_change_percent(current_value, last_day_value, last_week_value):
     change_percent_daily = round((((current_value_float - last_day_value_float) / current_value_float) * 100), 2)
     change_percent_weekly = round((((current_value_float - last_week_value_float) / current_value_float) * 100), 2)
 
+    sign_daily = ""
+    if (change_percent_daily > 0):
+        sign_daily = "+"
+    
+    sign_weekly = ""
+    if (change_percent_weekly > 0):
+        sign_weekly = "+"
+
     return {
-        "daily": "Daily change: " + str(change_percent_daily) + " %",
-        "weekly": "Weekly change: " + str(change_percent_weekly) + " %" 
+        "daily": "Daily change: " + sign_daily + str(change_percent_daily) + " %",
+        "weekly": "Weekly change: " + sign_weekly + str(change_percent_weekly) + " %" 
     }
 
 # If not exist, 2 files of market data for current week and last week will be created with dump data
@@ -184,19 +192,18 @@ async def build_embed():
     logger.info("Building Discord embed message")
 
     try:
+        # Get market-related data
         create_market_data_files()
         current_weekday = str(get_current_weekday())
         last_weekday = str(get_last_weekday())
-
         market_data = get_market_data()
-        
         market_data_current_week = market_data["current_week"]
         market_data_last_week = market_data["current_week"]
-
         logger.info(market_data_current_week)
         logger.info(market_data_last_week)
         logger.info(current_weekday)
         logger.info(last_weekday)
+        #############################
 
         # Get data from API calls
         # current_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
@@ -305,15 +312,32 @@ async def build_embed():
             logger.info(traceback.format_exc())
 
         my_iota_tvl = await format_currency(defillama_data['iota_tvl'])
+
+        current_value = defillama_data['iota_tvl']
+        last_day_value = market_data_current_week[last_weekday]["tvl-defilama"]
+        last_week_value = market_data_last_week[current_weekday]["tvl-defilama"]
+        change_percent = calc_change_percent(current_value, last_day_value, last_week_value)
+
         embed.add_field(name="Total Value Locked (DefiLlama)", value=f"{my_iota_tvl}", inline=True)
-        slack_data.append({"type": "section", "text": {"type": "mrkdwn", "text": "*Total Value Locked (DefiLlama)*\n" + str(my_iota_tvl) }})
+        slack_data.append({"type": "section", "text": {"type": "mrkdwn", "text": "*Total Value Locked (DefiLlama)*\n" + str(my_iota_tvl) + "\n" + change_percent["daily"] + "\n" + change_percent["weekly"]}})
+
+        current_value = total_defi_tx_24h
+        last_day_value = market_data_current_week[last_weekday]["24h-defi-txs"]
+        last_week_value = market_data_last_week[current_weekday]["24h-defi-txs"]
+        change_percent = calc_change_percent(current_value, last_day_value, last_week_value)
 
         embed.add_field(name="24h DeFi Transactions (GeckoTerminal)", value=total_defi_tx_24h, inline=True)
-        slack_data.append({"type": "section", "text": {"type": "mrkdwn", "text": "*24h DeFi Transactions (GeckoTerminal)*\n" + str(total_defi_tx_24h) }})
+        slack_data.append({"type": "section", "text": {"type": "mrkdwn", "text": "*24h DeFi Transactions (GeckoTerminal)*\n" + str(total_defi_tx_24h) + "\n" + change_percent["daily"] + "\n" + change_percent["weekly"]}})
 
         my_defi_total_volume = await format_currency(defi_total_volume)
+
+        current_value = defi_total_volume
+        last_day_value = market_data_current_week[last_weekday]["24h-defi-volume"]
+        last_week_value = market_data_last_week[current_weekday]["24h-defi-volume"]
+        change_percent = calc_change_percent(current_value, last_day_value, last_week_value)
+
         embed.add_field(name="24h DeFi Volume (GeckoTerminal)", value=f"{my_defi_total_volume}", inline=True)
-        slack_data.append({"type": "section", "text": {"type": "mrkdwn", "text": "*24h DeFi Volume (GeckoTerminal)*\n" + str(my_defi_total_volume) }})
+        slack_data.append({"type": "section", "text": {"type": "mrkdwn", "text": "*24h DeFi Volume (GeckoTerminal)*\n" + str(my_defi_total_volume) + "\n" + change_percent["daily"] + "\n" + change_percent["weekly"]}})
 
         embed.add_field(name="\u200b", value="\u200b", inline=False)
         # slack_data.append({"type": "section", "text": {"type": "mrkdwn", "text": "\n" }})
