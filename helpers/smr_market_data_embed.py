@@ -34,6 +34,7 @@ slack_channel = config["slack_channel"]
 market_data_current_week_file_path = "assets/market_data_current_week.pkl"
 market_data_last_week_file_path = "assets/market_data_last_week.pkl"
 
+# Static data if the file does not exist
 def get_market_data_last_week():
     return {
         # monday
@@ -94,6 +95,7 @@ def get_market_data_last_week():
         }
     }
 
+# Static data if the file does not exist
 def get_market_data_current_week():
     return {
         # monday
@@ -158,15 +160,17 @@ def calc_change_percent(current_value, last_day_value, last_week_value):
 
 # If not exist, 2 files of market data for current week and last week will be created with dump data
 def create_market_data_files():
-    past_data = get_market_data_current_week()
-    with open(market_data_current_week_file_path, "wb") as f:
-        pickle.dump(json.dumps(past_data), f)
-        f.close()
+    if (not os.path.isfile(market_data_current_week_file_path)):
+        past_data = get_market_data_current_week()
+        with open(market_data_current_week_file_path, "wb") as f:
+            pickle.dump(json.dumps(past_data), f)
+            f.close()
 
-    past_data = get_market_data_last_week()
-    with open(market_data_last_week_file_path, "wb") as f:
-        pickle.dump(json.dumps(past_data), f)
-        f.close()
+    if (not os.path.isfile(market_data_last_week_file_path)):
+        past_data = get_market_data_last_week()
+        with open(market_data_last_week_file_path, "wb") as f:
+            pickle.dump(json.dumps(past_data), f)
+            f.close()
 
 def get_market_data():
     market_data_current_week = ""
@@ -184,6 +188,76 @@ def get_market_data():
         "last_week": market_data_last_week
     }
 
+# Update whenever the bot restarts
+def update_market_data_current_week_file(market_data_current_week, current_weekday, market_data_current_day_latest):
+    # Update market_data_current_week for the current day with latest values
+    market_data_current_week[current_weekday] = market_data_current_day_latest
+    
+    with open(market_data_current_week_file_path, "wb") as f:
+        pickle.dump(json.dumps(market_data_current_week), f)
+        f.close()
+
+# Update only on every monday
+def update_market_data_last_week_file(market_data_current_week, current_weekday):
+    if (current_weekday != 0):
+        return
+    
+    with open(market_data_last_week_file_path, "wb") as f:
+        pickle.dump(json.dumps(market_data_current_week), f)
+        f.close()
+
+async def commented_out_func():
+    # Set up Bitfinex order book depth
+    bitfinex_order_book_data = await calculate_total_bitfinex_depth(coingecko_data['usd_price'])
+    logger.debug("Final bitfinex_order_book_data: %s", bitfinex_order_book_data)
+
+
+    positive_order_book_depth_str_2_percent = ""
+    negative_order_book_depth_str_2_percent = ""
+    positive_order_book_depth_str_5_percent = ""
+    negative_order_book_depth_str_5_percent = ""
+    positive_order_book_depth_str_10_percent = ""
+    negative_order_book_depth_str_10_percent = ""
+    positive_order_book_depth_str_20_percent = ""
+    negative_order_book_depth_str_20_percent = ""
+
+
+    # Iterate through the order book data and format the strings
+    for percentage, data in bitfinex_order_book_data['total_order_book_depth'].items():
+
+        # Format the 'buy' data using format_currency() function
+        if 'buy' in data:
+            formatted_buy_data = await format_currency(data['buy'], "SMR")
+            buy_data = f"Buy: {formatted_buy_data}\n\n"
+        else:
+            logger.error(f"Missing 'buy' key for percentage level {percentage}")
+
+        # Format the 'sell' data using format_currency() function
+        if 'sell' in data:
+            formatted_sell_data = await format_currency(data['sell'], "SMR")
+            sell_data = f"Sell: {formatted_sell_data}\n\n"
+        else:
+            logger.error(f"Missing 'sell' key for percentage level {percentage}")
+
+        buy_sell_info = f"**{percentage}**:\n{buy_data if percentage.startswith('-') else sell_data}"
+
+        if int(percentage[:-1]) == -2:
+            negative_order_book_depth_str_2_percent += buy_sell_info
+        elif int(percentage[:-1]) == -5:
+            negative_order_book_depth_str_5_percent += buy_sell_info
+        elif int(percentage[:-1]) == -10:
+            negative_order_book_depth_str_10_percent += buy_sell_info
+        elif int(percentage[:-1]) == -20:
+            negative_order_book_depth_str_20_percent += buy_sell_info
+        elif int(percentage[:-1]) == 2:
+            positive_order_book_depth_str_2_percent += buy_sell_info
+        elif int(percentage[:-1]) == 5:
+            positive_order_book_depth_str_5_percent += buy_sell_info
+        elif int(percentage[:-1]) == 10:
+            positive_order_book_depth_str_10_percent += buy_sell_info
+        elif int(percentage[:-1]) == 20:
+            positive_order_book_depth_str_20_percent += buy_sell_info
+
 # Functions
 async def build_embed():
     """
@@ -198,10 +272,15 @@ async def build_embed():
         last_weekday = str(get_last_weekday())
         market_data = get_market_data()
         market_data_current_week = market_data["current_week"]
-        market_data_last_week = market_data["current_week"]
+        market_data_last_week = market_data["last_week"]
+        
+        logger.info("market_data_current_week")
         logger.info(market_data_current_week)
+        logger.info("market_data_last_week")
         logger.info(market_data_last_week)
+        logger.info("current_weekday")
         logger.info(current_weekday)
+        logger.info("last_weekday")
         logger.info(last_weekday)
         #############################
 
@@ -217,56 +296,7 @@ async def build_embed():
         iota_rank = defillama_data["iota_rank"]
         discord_timestamp = await generate_discord_timestamp()
 
-        # Set up Bitfinex order book depth
-        # bitfinex_order_book_data = await calculate_total_bitfinex_depth(coingecko_data['usd_price'])
-        # logger.debug("Final bitfinex_order_book_data: %s", bitfinex_order_book_data)
-
-
-        # positive_order_book_depth_str_2_percent = ""
-        # negative_order_book_depth_str_2_percent = ""
-        # positive_order_book_depth_str_5_percent = ""
-        # negative_order_book_depth_str_5_percent = ""
-        # positive_order_book_depth_str_10_percent = ""
-        # negative_order_book_depth_str_10_percent = ""
-        # positive_order_book_depth_str_20_percent = ""
-        # negative_order_book_depth_str_20_percent = ""
-
-
-        # # Iterate through the order book data and format the strings
-        # for percentage, data in bitfinex_order_book_data['total_order_book_depth'].items():
-
-        #     # Format the 'buy' data using format_currency() function
-        #     if 'buy' in data:
-        #         formatted_buy_data = await format_currency(data['buy'], "SMR")
-        #         buy_data = f"Buy: {formatted_buy_data}\n\n"
-        #     else:
-        #         logger.error(f"Missing 'buy' key for percentage level {percentage}")
-
-        #     # Format the 'sell' data using format_currency() function
-        #     if 'sell' in data:
-        #         formatted_sell_data = await format_currency(data['sell'], "SMR")
-        #         sell_data = f"Sell: {formatted_sell_data}\n\n"
-        #     else:
-        #         logger.error(f"Missing 'sell' key for percentage level {percentage}")
-
-        #     buy_sell_info = f"**{percentage}**:\n{buy_data if percentage.startswith('-') else sell_data}"
-
-        #     if int(percentage[:-1]) == -2:
-        #         negative_order_book_depth_str_2_percent += buy_sell_info
-        #     elif int(percentage[:-1]) == -5:
-        #         negative_order_book_depth_str_5_percent += buy_sell_info
-        #     elif int(percentage[:-1]) == -10:
-        #         negative_order_book_depth_str_10_percent += buy_sell_info
-        #     elif int(percentage[:-1]) == -20:
-        #         negative_order_book_depth_str_20_percent += buy_sell_info
-        #     elif int(percentage[:-1]) == 2:
-        #         positive_order_book_depth_str_2_percent += buy_sell_info
-        #     elif int(percentage[:-1]) == 5:
-        #         positive_order_book_depth_str_5_percent += buy_sell_info
-        #     elif int(percentage[:-1]) == 10:
-        #         positive_order_book_depth_str_10_percent += buy_sell_info
-        #     elif int(percentage[:-1]) == 20:
-        #         positive_order_book_depth_str_20_percent += buy_sell_info
+        # await commented_out_func()
 
         # Create an embed instance
         embed = discord.Embed(title="IOTA Market Data", color=0x00FF00)
@@ -371,9 +401,23 @@ async def build_embed():
 
         # Post data to slack channel
         slack_data = '{"blocks": ' + json.dumps(slack_data) + '}'
-        logger.info(slack_data)
+        # logger.info(slack_data)
         res = requests.post(url=slack_channel, data=slack_data)
         # logger.info(res)
+
+        market_data_current_day_latest = {
+            "iota-price-coingecko": coingecko_data['usd_price'],
+            "24h-volume-coingecko": coingecko_24h_vol,
+            "tvl-defilama": defillama_data['iota_tvl'],
+            "24h-defi-txs": total_defi_tx_24h,
+            "24h-defi-volume": defi_total_volume
+        }
+        
+        logger.info("market_data_current_day_latest")
+        logger.info(market_data_current_day_latest)
+
+        update_market_data_current_week_file(market_data_current_week, current_weekday, market_data_current_day_latest)
+        update_market_data_last_week_file(market_data_current_week, current_weekday)
     except Exception:
         logger.info(traceback.format_exc())
 
