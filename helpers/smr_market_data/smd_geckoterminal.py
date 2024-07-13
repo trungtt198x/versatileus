@@ -4,6 +4,7 @@ Description:
 Get API data for IOTA from GeckoTerminal API
 Version: 5.5.0
 """
+import geckoterminal
 import requests
 import logging
 import helpers.configuration_manager as configuration_manager
@@ -75,3 +76,62 @@ async def get_geckoterminal_data():
         logger.error("Request Exception occurred: %s", err)
     except Exception as e:
         logger.error("An unexpected error occurred: %s", e)
+
+def get_networks():
+    """
+    Retrieves a list of networks from geckoterminal.
+
+    Returns:
+        list: A list of networks.
+    """
+    networks = []
+    index = 1
+    while True:
+        n = geckoterminal.get_networks(index)
+        networks += n['data']
+        if n['links']['next'] is None:
+            break
+        index += 1
+
+    return networks
+
+def get_pools(network_id):
+    """
+    Retrieves a list of pools for a given network ID.
+
+    Args:
+        network_id (int): The ID of the network.
+
+    Returns:
+        list: A list of pools.
+
+    """
+    pools = []
+    index = 1
+    while True:
+        p = geckoterminal.get_top_pools(network_id, page=index)
+        if not p['data']:
+            break
+        pools += p['data']
+        index += 1
+
+    return pools
+
+def get_geckoterminal_tvl():
+    networks = get_networks()
+    logger.info('Found {} networks'.format(len(networks)))
+
+    network = [n for n in networks if n['id'] == geckoterminal_ticker][0]
+    logger.info(network)
+
+    network_name = network['attributes']['name']
+
+    # Get pools
+    pools = get_pools(geckoterminal_ticker)
+    logger.info('Found {} pools on {}'.format(len(pools), network_name))
+
+    # Calculate TVL by summing the reserve_in_usd of each pool
+    tvl = sum([float(pool['attributes']['reserve_in_usd']) for pool in pools])
+    logger.info('Total TVL on {}: ${}'.format(network_name, tvl))
+
+    return tvl

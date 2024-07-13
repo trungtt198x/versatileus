@@ -21,6 +21,7 @@ from helpers.smr_market_data.smd_coingecko import get_coingecko_exchange_data
 from helpers.smr_market_data.smd_coingecko import get_coingecko_24h_trading_volume
 from helpers.smr_market_data.smd_shimmer import get_shimmer_data
 from helpers.smr_market_data.smd_geckoterminal import get_geckoterminal_data
+from helpers.smr_market_data.smd_geckoterminal import get_geckoterminal_tvl
 from helpers.smr_market_data.smd_defillama import get_defillama_data
 
 
@@ -42,6 +43,7 @@ def get_market_data_last_week():
             "iota-price-coingecko": 0.17112,
             "24h-volume-coingecko": 15409685.01,
             "tvl-defilama": 227364.37,
+            "tvl-geckoterminal": 227364.37,
             "24h-defi-txs": 249,
             "24h-defi-volume": 10271.84
         },
@@ -50,6 +52,7 @@ def get_market_data_last_week():
             "iota-price-coingecko": 0.17112,
             "24h-volume-coingecko": 15409685.01,
             "tvl-defilama": 227364.37,
+            "tvl-geckoterminal": 227364.37,
             "24h-defi-txs": 249,
             "24h-defi-volume": 10271.84
         },
@@ -58,6 +61,7 @@ def get_market_data_last_week():
             "iota-price-coingecko": 0.17112,
             "24h-volume-coingecko": 15409685.01,
             "tvl-defilama": 227364.37,
+            "tvl-geckoterminal": 227364.37,
             "24h-defi-txs": 249,
             "24h-defi-volume": 10271.84
         },
@@ -66,6 +70,7 @@ def get_market_data_last_week():
             "iota-price-coingecko": 0.17583,
             "24h-volume-coingecko": 11092023.27,
             "tvl-defilama": 357441.75,
+            "tvl-geckoterminal": 227364.37,
             "24h-defi-txs": 249,
             "24h-defi-volume": 10556.71
         },
@@ -74,6 +79,7 @@ def get_market_data_last_week():
             "iota-price-coingecko": 0.17721,
             "24h-volume-coingecko": 11526929.93,
             "tvl-defilama": 354708.34,
+            "tvl-geckoterminal": 227364.37,
             "24h-defi-txs": 116,
             "24h-defi-volume": 11000
         },
@@ -82,6 +88,7 @@ def get_market_data_last_week():
             "iota-price-coingecko": 0.17249,
             "24h-volume-coingecko": 10855710.61,
             "tvl-defilama": 361149.08,
+            "tvl-geckoterminal": 227364.37,
             "24h-defi-txs": 199,
             "24h-defi-volume": 10814.00
         },
@@ -90,6 +97,7 @@ def get_market_data_last_week():
             "iota-price-coingecko": 0.17117,
             "24h-volume-coingecko": 6617140.13,
             "tvl-defilama": 330935.81,
+            "tvl-geckoterminal": 227364.37,
             "24h-defi-txs": 160,
             "24h-defi-volume": 3133.20
         }
@@ -103,6 +111,7 @@ def get_market_data_current_week():
             "iota-price-coingecko": 0.17159,
             "24h-volume-coingecko": 8582530.23,
             "tvl-defilama": 341339.69,
+            "tvl-geckoterminal": 227364.37,
             "24h-defi-txs": 262,
             "24h-defi-volume": 10271.84
         },
@@ -111,6 +120,7 @@ def get_market_data_current_week():
             "iota-price-coingecko": 0.16962,
             "24h-volume-coingecko": 9395325.27,
             "tvl-defilama": 338453.06,
+            "tvl-geckoterminal": 227364.37,
             "24h-defi-txs": 260,
             "24h-defi-volume": 12556.71
         },
@@ -119,6 +129,43 @@ def get_market_data_current_week():
             "iota-price-coingecko": 0.16915,
             "24h-volume-coingecko": 10086899.93,
             "tvl-defilama": 322733.01,
+            "tvl-geckoterminal": 227364.37,
+            "24h-defi-txs": 472,
+            "24h-defi-volume": 24685.36
+        },
+        # thursday
+        3: {
+            "iota-price-coingecko": 0.16915,
+            "24h-volume-coingecko": 10086899.93,
+            "tvl-defilama": 322733.01,
+            "tvl-geckoterminal": 227364.37,
+            "24h-defi-txs": 472,
+            "24h-defi-volume": 24685.36
+        },
+        # friday
+        4: {
+            "iota-price-coingecko": 0.16915,
+            "24h-volume-coingecko": 10086899.93,
+            "tvl-defilama": 322733.01,
+            "tvl-geckoterminal": 227364.37,
+            "24h-defi-txs": 472,
+            "24h-defi-volume": 24685.36
+        },
+        # saturday
+        5: {
+            "iota-price-coingecko": 0.16915,
+            "24h-volume-coingecko": 10086899.93,
+            "tvl-defilama": 322733.01,
+            "tvl-geckoterminal": 227364.37,
+            "24h-defi-txs": 472,
+            "24h-defi-volume": 24685.36
+        },
+        # sunday
+        6: {
+            "iota-price-coingecko": 0.16915,
+            "24h-volume-coingecko": 10086899.93,
+            "tvl-defilama": 322733.01,
+            "tvl-geckoterminal": 227364.37,
             "24h-defi-txs": 472,
             "24h-defi-volume": 24685.36
         }
@@ -290,6 +337,7 @@ async def build_embed():
         coingecko_24h_vol = await get_coingecko_24h_trading_volume()
         defillama_data = await get_defillama_data()
         geckoterminal_data = await get_geckoterminal_data()
+        geckoterminal_tvl = get_geckoterminal_tvl()
         shimmer_data = await get_shimmer_data()
         total_defi_tx_24h = geckoterminal_data["total_defi_tx_24h"]
         defi_total_volume = geckoterminal_data['defi_total_volume']
@@ -351,6 +399,15 @@ async def build_embed():
         embed.add_field(name="Total Value Locked (DefiLlama)", value=f"{my_iota_tvl}", inline=True)
         slack_data.append({"type": "section", "text": {"type": "mrkdwn", "text": "*Total Value Locked (DefiLlama)*\n" + str(my_iota_tvl) + "\n" + change_percent["daily"] + "\n" + change_percent["weekly"]}})
 
+        current_value = geckoterminal_tvl
+        last_day_value = market_data_current_week[last_weekday]["tvl-geckoterminal"]
+        last_week_value = market_data_last_week[current_weekday]["tvl-geckoterminal"]
+        change_percent = calc_change_percent(current_value, last_day_value, last_week_value)
+
+        formated_tvl = await format_currency(geckoterminal_tvl)
+        embed.add_field(name="Total Value Locked (Geckoterminal)", value=f"{formated_tvl}", inline=True)
+        slack_data.append({"type": "section", "text": {"type": "mrkdwn", "text": "*Total Value Locked (Geckoterminal)*\n" + str(formated_tvl) + "\n" + change_percent["daily"] + "\n" + change_percent["weekly"]}})
+
         current_value = total_defi_tx_24h
         last_day_value = market_data_current_week[last_weekday]["24h-defi-txs"]
         last_week_value = market_data_last_week[current_weekday]["24h-defi-txs"]
@@ -409,6 +466,7 @@ async def build_embed():
             "iota-price-coingecko": coingecko_data['usd_price'],
             "24h-volume-coingecko": coingecko_24h_vol,
             "tvl-defilama": defillama_data['iota_tvl'],
+            "tvl-geckoterminal": geckoterminal_tvl,
             "24h-defi-txs": total_defi_tx_24h,
             "24h-defi-volume": defi_total_volume
         }
