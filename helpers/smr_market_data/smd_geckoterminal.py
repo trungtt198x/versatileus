@@ -4,6 +4,7 @@ Description:
 Get API data for IOTA from GeckoTerminal API
 Version: 5.5.0
 """
+import geckoterminal
 import requests
 import logging
 import helpers.configuration_manager as configuration_manager
@@ -28,6 +29,7 @@ async def get_geckoterminal_data():
     geckoterminal_url = f"https://api.geckoterminal.com/api/v2/networks/{geckoterminal_ticker}/pools"
     headers = {"accept": "application/json"}
     total_defi_volume_usd_h24 = 0
+    total_reserve_in_usd = 0
     total_defi_tx_24h = 0
     page = 1
 
@@ -44,7 +46,9 @@ async def get_geckoterminal_data():
 
                 for entry in defi_volume_data:
                     h24_volume = float(entry["attributes"]["volume_usd"]["h24"])
+                    reserve_in_usd = float(entry["attributes"]["reserve_in_usd"])
                     total_defi_volume_usd_h24 += h24_volume
+                    total_reserve_in_usd += reserve_in_usd
 
                     # Extract transactions data for h24
                     transactions_h24 = entry["attributes"]["transactions"]["h24"]
@@ -56,8 +60,8 @@ async def get_geckoterminal_data():
                 logger.debug("Total USD 24h Volume for all pools: %s", total_defi_volume_usd_h24)
                 logger.debug("Total 24h Defi Transactions for IOTA EVM: %s", total_defi_tx_24h)
 
-                if total_defi_volume_usd_h24 > 0 and total_defi_tx_24h > 0:
-                    return {"defi_total_volume": total_defi_volume_usd_h24, "total_defi_tx_24h": total_defi_tx_24h}
+                if total_defi_volume_usd_h24 > 0 and total_defi_tx_24h > 0 and total_reserve_in_usd > 0:
+                    return {"defi_total_volume": total_defi_volume_usd_h24, "total_defi_tx_24h": total_defi_tx_24h, "total_reserve_in_usd": total_reserve_in_usd}
                 else:
                     logger.debug("IOTA Total Volume or Total Transactions not found in the response.")
             elif defi_volume.status_code == 404:
