@@ -21,7 +21,6 @@ from helpers.smr_market_data.smd_coingecko import get_coingecko_exchange_data
 from helpers.smr_market_data.smd_coingecko import get_coingecko_24h_trading_volume
 from helpers.smr_market_data.smd_shimmer import get_shimmer_data
 from helpers.smr_market_data.smd_geckoterminal import get_geckoterminal_data
-from helpers.smr_market_data.smd_geckoterminal import get_geckoterminal_tvl
 from helpers.smr_market_data.smd_defillama import get_defillama_data
 
 
@@ -185,25 +184,31 @@ def get_last_weekday():
 
 def calc_change_percent(current_value, last_day_value, last_week_value):
     
-    current_value_float = float(current_value)
-    last_day_value_float = float(last_day_value)
-    last_week_value_float = float(last_week_value)
+    try:
+        current_value_float = float(current_value)
+        last_day_value_float = float(last_day_value)
+        last_week_value_float = float(last_week_value)
 
-    change_percent_daily = round((((current_value_float - last_day_value_float) / current_value_float) * 100), 2)
-    change_percent_weekly = round((((current_value_float - last_week_value_float) / current_value_float) * 100), 2)
+        change_percent_daily = round((((current_value_float - last_day_value_float) / current_value_float) * 100), 2)
+        change_percent_weekly = round((((current_value_float - last_week_value_float) / current_value_float) * 100), 2)
 
-    sign_daily = ""
-    if (change_percent_daily > 0):
-        sign_daily = "+"
-    
-    sign_weekly = ""
-    if (change_percent_weekly > 0):
-        sign_weekly = "+"
+        sign_daily = ""
+        if (change_percent_daily > 0):
+            sign_daily = "+"
+        
+        sign_weekly = ""
+        if (change_percent_weekly > 0):
+            sign_weekly = "+"
 
-    return {
-        "daily": "Daily change: " + sign_daily + str(change_percent_daily) + " %",
-        "weekly": "Weekly change: " + sign_weekly + str(change_percent_weekly) + " %" 
-    }
+        return {
+            "daily": "Daily change: " + sign_daily + str(change_percent_daily) + " %",
+            "weekly": "Weekly change: " + sign_weekly + str(change_percent_weekly) + " %" 
+        }
+    except Exception:
+        return {
+            "daily": "Daily change: N/A",
+            "weekly": "Weekly change: N/A" 
+        }
 
 # If not exist, 2 files of market data for current week and last week will be created with dump data
 def create_market_data_files():
@@ -337,10 +342,10 @@ async def build_embed():
         coingecko_24h_vol = await get_coingecko_24h_trading_volume()
         defillama_data = await get_defillama_data()
         geckoterminal_data = await get_geckoterminal_data()
-        geckoterminal_tvl = get_geckoterminal_tvl()
         shimmer_data = await get_shimmer_data()
         total_defi_tx_24h = geckoterminal_data["total_defi_tx_24h"]
         defi_total_volume = geckoterminal_data['defi_total_volume']
+        geckoterminal_tvl = geckoterminal_data['total_reserve_in_usd']
         iota_rank = defillama_data["iota_rank"]
         discord_timestamp = await generate_discord_timestamp()
 
@@ -404,9 +409,9 @@ async def build_embed():
         last_week_value = market_data_last_week[current_weekday]["tvl-geckoterminal"]
         change_percent = calc_change_percent(current_value, last_day_value, last_week_value)
 
-        formated_tvl = await format_currency(geckoterminal_tvl)
-        embed.add_field(name="Total Value Locked (Geckoterminal)", value=f"{formated_tvl}", inline=True)
-        slack_data.append({"type": "section", "text": {"type": "mrkdwn", "text": "*Total Value Locked (Geckoterminal)*\n" + str(formated_tvl) + "\n" + change_percent["daily"] + "\n" + change_percent["weekly"]}})
+        my_iota_tvl_geckoterminal = await format_currency(geckoterminal_tvl)
+        embed.add_field(name="Total Value Locked (Geckoterminal)", value=f"{my_iota_tvl_geckoterminal}", inline=True)
+        slack_data.append({"type": "section", "text": {"type": "mrkdwn", "text": "*Total Value Locked (Geckoterminal)*\n" + str(my_iota_tvl_geckoterminal) + "\n" + change_percent["daily"] + "\n" + change_percent["weekly"]}})
 
         current_value = total_defi_tx_24h
         last_day_value = market_data_current_week[last_weekday]["24h-defi-txs"]

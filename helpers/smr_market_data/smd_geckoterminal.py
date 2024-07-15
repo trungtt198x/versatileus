@@ -29,6 +29,7 @@ async def get_geckoterminal_data():
     geckoterminal_url = f"https://api.geckoterminal.com/api/v2/networks/{geckoterminal_ticker}/pools"
     headers = {"accept": "application/json"}
     total_defi_volume_usd_h24 = 0
+    total_reserve_in_usd = 0
     total_defi_tx_24h = 0
     page = 1
 
@@ -45,7 +46,9 @@ async def get_geckoterminal_data():
 
                 for entry in defi_volume_data:
                     h24_volume = float(entry["attributes"]["volume_usd"]["h24"])
+                    reserve_in_usd = float(entry["attributes"]["reserve_in_usd"])
                     total_defi_volume_usd_h24 += h24_volume
+                    total_reserve_in_usd += reserve_in_usd
 
                     # Extract transactions data for h24
                     transactions_h24 = entry["attributes"]["transactions"]["h24"]
@@ -57,8 +60,8 @@ async def get_geckoterminal_data():
                 logger.debug("Total USD 24h Volume for all pools: %s", total_defi_volume_usd_h24)
                 logger.debug("Total 24h Defi Transactions for IOTA EVM: %s", total_defi_tx_24h)
 
-                if total_defi_volume_usd_h24 > 0 and total_defi_tx_24h > 0:
-                    return {"defi_total_volume": total_defi_volume_usd_h24, "total_defi_tx_24h": total_defi_tx_24h}
+                if total_defi_volume_usd_h24 > 0 and total_defi_tx_24h > 0 and total_reserve_in_usd > 0:
+                    return {"defi_total_volume": total_defi_volume_usd_h24, "total_defi_tx_24h": total_defi_tx_24h, "total_reserve_in_usd": total_reserve_in_usd}
                 else:
                     logger.debug("IOTA Total Volume or Total Transactions not found in the response.")
             elif defi_volume.status_code == 404:
@@ -76,62 +79,3 @@ async def get_geckoterminal_data():
         logger.error("Request Exception occurred: %s", err)
     except Exception as e:
         logger.error("An unexpected error occurred: %s", e)
-
-def get_networks():
-    """
-    Retrieves a list of networks from geckoterminal.
-
-    Returns:
-        list: A list of networks.
-    """
-    networks = []
-    index = 1
-    while True:
-        n = geckoterminal.get_networks(index)
-        networks += n['data']
-        if n['links']['next'] is None:
-            break
-        index += 1
-
-    return networks
-
-def get_pools(network_id):
-    """
-    Retrieves a list of pools for a given network ID.
-
-    Args:
-        network_id (int): The ID of the network.
-
-    Returns:
-        list: A list of pools.
-
-    """
-    pools = []
-    index = 1
-    while True:
-        p = geckoterminal.get_top_pools(network_id, page=index)
-        if not p['data']:
-            break
-        pools += p['data']
-        index += 1
-
-    return pools
-
-def get_geckoterminal_tvl():
-    networks = get_networks()
-    logger.info('Found {} networks'.format(len(networks)))
-
-    network = [n for n in networks if n['id'] == geckoterminal_ticker][0]
-    logger.info(network)
-
-    network_name = network['attributes']['name']
-
-    # Get pools
-    pools = get_pools(geckoterminal_ticker)
-    logger.info('Found {} pools on {}'.format(len(pools), network_name))
-
-    # Calculate TVL by summing the reserve_in_usd of each pool
-    tvl = sum([float(pool['attributes']['reserve_in_usd']) for pool in pools])
-    logger.info('Total TVL on {}: ${}'.format(network_name, tvl))
-
-    return tvl
