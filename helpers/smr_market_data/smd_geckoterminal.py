@@ -4,7 +4,6 @@ Description:
 Get API data for IOTA from GeckoTerminal API
 Version: 5.5.0
 """
-import geckoterminal
 import requests
 import logging
 import helpers.configuration_manager as configuration_manager
