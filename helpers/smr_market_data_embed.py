@@ -405,8 +405,15 @@ async def build_embed():
         slack_data.append({"type": "section", "text": {"type": "mrkdwn", "text": "*Total Value Locked (DefiLlama)*\n" + str(my_iota_tvl) + "\n" + change_percent["daily"] + "\n" + change_percent["weekly"]}})
 
         current_value = geckoterminal_tvl
-        last_day_value = market_data_current_week[last_weekday]["tvl-geckoterminal"]
-        last_week_value = market_data_last_week[current_weekday]["tvl-geckoterminal"]
+        last_day_value
+        last_week_value
+        try:
+            last_day_value = market_data_current_week[last_weekday]["tvl-geckoterminal"]
+            last_week_value = market_data_last_week[current_weekday]["tvl-geckoterminal"]
+        except Exception:
+            last_day_value = None
+            last_week_value = None
+        
         change_percent = calc_change_percent(current_value, last_day_value, last_week_value)
 
         my_iota_tvl_geckoterminal = await format_currency(geckoterminal_tvl)
