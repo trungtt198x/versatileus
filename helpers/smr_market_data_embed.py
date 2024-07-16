@@ -185,8 +185,8 @@ def get_last_weekday():
 def calc_change_percent(current_value, last_day_value, last_week_value):
     current_value_float = float(current_value)
 
-    my_daily_change
-    my_weekly_change
+    my_daily_change = ""
+    my_weekly_change = ""
     
     # Calc daily change
     try:
