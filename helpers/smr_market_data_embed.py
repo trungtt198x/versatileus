@@ -183,32 +183,43 @@ def get_last_weekday():
         return current_week_day - 1
 
 def calc_change_percent(current_value, last_day_value, last_week_value):
+    current_value_float = float(current_value)
+
+    my_daily_change
+    my_weekly_change
     
+    # Calc daily change
     try:
-        current_value_float = float(current_value)
         last_day_value_float = float(last_day_value)
-        last_week_value_float = float(last_week_value)
 
         change_percent_daily = round((((current_value_float - last_day_value_float) / current_value_float) * 100), 2)
-        change_percent_weekly = round((((current_value_float - last_week_value_float) / current_value_float) * 100), 2)
 
         sign_daily = ""
         if (change_percent_daily > 0):
             sign_daily = "+"
         
+        my_daily_change = "Daily change: " + sign_daily + str(change_percent_daily) + " %"
+    except Exception:
+        my_daily_change = "Daily change: N/A"
+
+    # Calc weekly change
+    try:
+        last_week_value_float = float(last_week_value)
+
+        change_percent_weekly = round((((current_value_float - last_week_value_float) / current_value_float) * 100), 2)
+
         sign_weekly = ""
         if (change_percent_weekly > 0):
             sign_weekly = "+"
 
-        return {
-            "daily": "Daily change: " + sign_daily + str(change_percent_daily) + " %",
-            "weekly": "Weekly change: " + sign_weekly + str(change_percent_weekly) + " %" 
-        }
+        my_weekly_change = "Weekly change: " + sign_weekly + str(change_percent_weekly) + " %" 
     except Exception:
-        return {
-            "daily": "Daily change: N/A",
-            "weekly": "Weekly change: N/A" 
-        }
+        my_weekly_change = "Weekly change: N/A"
+
+    return {
+        "daily": my_daily_change,
+        "weekly": my_weekly_change
+    }
 
 # If not exist, 2 files of market data for current week and last week will be created with dump data
 def create_market_data_files():
@@ -409,9 +420,12 @@ async def build_embed():
         last_week_value
         try:
             last_day_value = market_data_current_week[last_weekday]["tvl-geckoterminal"]
-            last_week_value = market_data_last_week[current_weekday]["tvl-geckoterminal"]
         except Exception:
             last_day_value = None
+
+        try:
+            last_week_value = market_data_last_week[current_weekday]["tvl-geckoterminal"]
+        except Exception:
             last_week_value = None
         
         change_percent = calc_change_percent(current_value, last_day_value, last_week_value)
