@@ -260,14 +260,16 @@ def update_market_data_current_week_file(market_data_current_week, current_weekd
         pickle.dump(json.dumps(market_data_current_week), f)
         f.close()
 
-# Update only on every monday
+# Update only on every wednesday
 def update_market_data_last_week_file(market_data_current_week, current_weekday):
-    if (current_weekday != 0):
+    if (int(current_weekday) != 2):
         return
     
     with open(market_data_last_week_file_path, "wb") as f:
         pickle.dump(json.dumps(market_data_current_week), f)
         f.close()
+
+    logger.info("update_market_data_last_week_file on every Wednesday - done")
 
 async def commented_out_func():
     # Set up Bitfinex order book depth
