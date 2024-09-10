@@ -28,7 +28,6 @@ async def get_geckoterminal_data():
     geckoterminal_url = f"https://api.geckoterminal.com/api/v2/networks/{geckoterminal_ticker}/pools"
     headers = {"accept": "application/json"}
     total_defi_volume_usd_h24 = 0
-    total_reserve_in_usd = 0
     total_defi_tx_24h = 0
     page = 1
 
@@ -45,9 +44,7 @@ async def get_geckoterminal_data():
 
                 for entry in defi_volume_data:
                     h24_volume = float(entry["attributes"]["volume_usd"]["h24"])
-                    reserve_in_usd = float(entry["attributes"]["reserve_in_usd"])
                     total_defi_volume_usd_h24 += h24_volume
-                    total_reserve_in_usd += reserve_in_usd
 
                     # Extract transactions data for h24
                     transactions_h24 = entry["attributes"]["transactions"]["h24"]
@@ -59,8 +56,8 @@ async def get_geckoterminal_data():
                 logger.debug("Total USD 24h Volume for all pools: %s", total_defi_volume_usd_h24)
                 logger.debug("Total 24h Defi Transactions for IOTA EVM: %s", total_defi_tx_24h)
 
-                if total_defi_volume_usd_h24 > 0 and total_defi_tx_24h > 0 and total_reserve_in_usd > 0:
-                    return {"defi_total_volume": total_defi_volume_usd_h24, "total_defi_tx_24h": total_defi_tx_24h, "total_reserve_in_usd": total_reserve_in_usd}
+                if total_defi_volume_usd_h24 > 0 and total_defi_tx_24h > 0:
+                    return {"defi_total_volume": total_defi_volume_usd_h24, "total_defi_tx_24h": total_defi_tx_24h}
                 else:
                     logger.debug("IOTA Total Volume or Total Transactions not found in the response.")
             elif defi_volume.status_code == 404:
@@ -69,6 +66,57 @@ async def get_geckoterminal_data():
                 logger.error("Unexpected status code: %s", defi_volume.status_code)
 
             page += 1
+
+    except requests.exceptions.Timeout:
+        logger.error("GeckoTerminal API request timed out.")
+    except requests.exceptions.HTTPError as errh:
+        logger.error("HTTP Error occurred: %s", errh)
+    except requests.exceptions.RequestException as err:
+        logger.error("Request Exception occurred: %s", err)
+    except Exception as e:
+        logger.error("An unexpected error occurred: %s", e)
+
+async def get_geckoterminal_data_tvl():
+    """
+    Get GeckoTerminal Defi Volume data for IOTA EVM.
+
+    Returns:
+        dict: Dictionary containing IOTA EVM's total 24h volume and total 24h transactions.
+    """
+    logger.info("Getting GeckoTerminal Defi Volume data for IOTA EVM")
+    geckoterminal_url = f"https://api.geckoterminal.com/api/v2/networks/{geckoterminal_ticker}/pools"
+    headers = {"accept": "application/json"}
+    total_reserve_in_usd = 0
+    page = 1
+
+    try:
+        while True:
+            # Make a request to the GeckoTerminal API with the current page number
+            defi_volume = requests.get(geckoterminal_url + f"?page={page}", headers=headers, timeout=10)
+            defi_volume.raise_for_status()
+
+            if defi_volume.status_code == 200:
+                defi_volume_json = defi_volume.json()
+                # Extract and parse the JSON response
+                defi_volume_data = defi_volume_json.get("data", [])
+
+                if len(defi_volume_data.length) == 0:
+                    logger.info("Pagination ends at page: %d", page)
+                    break
+
+                for entry in defi_volume_data:
+                    reserve_in_usd = float(entry["attributes"]["reserve_in_usd"])
+                    total_reserve_in_usd += reserve_in_usd
+
+            elif defi_volume.status_code == 404:
+                logger.info("Pagination ends at page: %d", page)
+                break
+            else:
+                logger.error("Unexpected status code: %s", defi_volume.status_code)
+                break
+
+            page += 1
+        return total_reserve_in_usd
 
     except requests.exceptions.Timeout:
         logger.error("GeckoTerminal API request timed out.")

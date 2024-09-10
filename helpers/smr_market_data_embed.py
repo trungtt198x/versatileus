@@ -20,7 +20,7 @@ from helpers.smr_market_data.smd_bitfinex import calculate_total_bitfinex_depth
 from helpers.smr_market_data.smd_coingecko import get_coingecko_exchange_data
 from helpers.smr_market_data.smd_coingecko import get_coingecko_24h_trading_volume
 from helpers.smr_market_data.smd_shimmer import get_shimmer_data
-from helpers.smr_market_data.smd_geckoterminal import get_geckoterminal_data
+from helpers.smr_market_data.smd_geckoterminal import get_geckoterminal_data, get_geckoterminal_data_tvl 
 from helpers.smr_market_data.smd_defillama import get_defillama_data
 
 
@@ -355,10 +355,11 @@ async def build_embed():
         coingecko_24h_vol = await get_coingecko_24h_trading_volume()
         defillama_data = await get_defillama_data()
         geckoterminal_data = await get_geckoterminal_data()
+        geckoterminal_tvl = await get_geckoterminal_data_tvl()
         shimmer_data = await get_shimmer_data()
         total_defi_tx_24h = geckoterminal_data["total_defi_tx_24h"]
         defi_total_volume = geckoterminal_data['defi_total_volume']
-        geckoterminal_tvl = geckoterminal_data['total_reserve_in_usd']
+        
         iota_rank = defillama_data["iota_rank"]
         discord_timestamp = await generate_discord_timestamp()
 
