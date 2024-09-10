@@ -100,7 +100,7 @@ async def get_geckoterminal_data_tvl():
                 # Extract and parse the JSON response
                 defi_volume_data = defi_volume_json.get("data", [])
 
-                if len(defi_volume_data.length) == 0:
+                if len(defi_volume_data) == 0:
                     logger.info("Pagination ends at page: %d", page)
                     break
 
@@ -108,8 +108,10 @@ async def get_geckoterminal_data_tvl():
                     reserve_in_usd = float(entry["attributes"]["reserve_in_usd"])
                     total_reserve_in_usd += reserve_in_usd
 
+                logger.info("At page: %d, TVL is %d", page, total_reserve_in_usd)
+
             elif defi_volume.status_code == 404:
-                logger.info("Pagination ends at page: %d", page)
+                logger.info("Status code 404. Pagination ends at page: %d", page)
                 break
             else:
                 logger.error("Unexpected status code: %s", defi_volume.status_code)
