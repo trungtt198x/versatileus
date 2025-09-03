@@ -570,7 +570,7 @@ async def build_embed():
 
         tvl_protocols_str = ""
         for protocol, tvl in tvl_protocols.items():
-            tvl_protocols_str += f"\n{protocol}: {format_currency(tvl)}"
+            tvl_protocols_str += f"\n{protocol}: {await format_currency(tvl)}"
 
         embed.add_field(name="Total Value Locked (DeFiLlama)", value=f"{my_iota_L1_tvl_total_format}", inline=True)
         slack_data.append({"type": "section", "text": {"type": "mrkdwn", "text": "*Total Value Locked (DeFiLlama)*\n" + str(my_iota_L1_tvl_total_format) + "\n" + change_percent["daily"] + "\n" + change_percent["weekly"] + tvl_protocols_str}})
