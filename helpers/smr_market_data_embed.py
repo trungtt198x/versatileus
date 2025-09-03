@@ -573,7 +573,7 @@ async def build_embed():
             tvl_protocols_str += f"\n{protocol}: {await format_currency(tvl)}"
 
         embed.add_field(name="TVL General (DeFiLlama)", value=f"{my_iota_L1_tvl_total_format}", inline=True)
-        slack_data.append({"type": "section", "text": {"type": "mrkdwn", "text": "*TVL General (DeFiLlama)*\n" + str(my_iota_L1_tvl_total_format) + "\n" + change_percent["daily"] + "\n" + change_percent["weekly"] + tvl_protocols_str}})
+        slack_data.append({"type": "section", "text": {"type": "mrkdwn", "text": "*TVL General (DeFiLlama)*\n" + str(my_iota_L1_tvl_total_format) + "\n" + change_percent["daily"] + "\n" + change_percent["weekly"]}})
 
         slack_data.append({"type": "section", "text": {"type": "mrkdwn", "text": "*TVL Per Protocol (DeFiLlama)*" + tvl_protocols_str}})
 
