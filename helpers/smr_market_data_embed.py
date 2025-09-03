@@ -547,8 +547,6 @@ async def build_embed():
 
         embed.add_field(name="\u200b", value="\u200b", inline=False)
         
-        slack_data.append({"type": "divider"})
-
         ############# DeFi Data of IOTA L1 #############
         slack_data.append({"type": "divider"})
         embed.add_field(name="DeFi Data IOTA L1", value="\u200b", inline=False)
