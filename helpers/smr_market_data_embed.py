@@ -572,8 +572,10 @@ async def build_embed():
         for protocol, tvl in tvl_protocols.items():
             tvl_protocols_str += f"\n{protocol}: {await format_currency(tvl)}"
 
-        embed.add_field(name="Total Value Locked (DeFiLlama)", value=f"{my_iota_L1_tvl_total_format}", inline=True)
-        slack_data.append({"type": "section", "text": {"type": "mrkdwn", "text": "*Total Value Locked (DeFiLlama)*\n" + str(my_iota_L1_tvl_total_format) + "\n" + change_percent["daily"] + "\n" + change_percent["weekly"] + tvl_protocols_str}})
+        embed.add_field(name="TVL General (DeFiLlama)", value=f"{my_iota_L1_tvl_total_format}", inline=True)
+        slack_data.append({"type": "section", "text": {"type": "mrkdwn", "text": "*TVL General (DeFiLlama)*\n" + str(my_iota_L1_tvl_total_format) + "\n" + change_percent["daily"] + "\n" + change_percent["weekly"] + tvl_protocols_str}})
+
+        slack_data.append({"type": "section", "text": {"type": "mrkdwn", "text": "*TVL Per Protocol (DeFiLlama)*" + tvl_protocols_str}})
 
         ################################################
 
@@ -600,8 +602,8 @@ async def build_embed():
         last_week_value = market_data_last_week[current_weekday]["tvl-defilama"]
         change_percent = calc_change_percent(current_value, last_day_value, last_week_value)
 
-        embed.add_field(name="Total Value Locked (DeFiLlama)", value=f"{my_iota_evm_tvl}", inline=True)
-        slack_data.append({"type": "section", "text": {"type": "mrkdwn", "text": "*Total Value Locked (DeFiLlama)*\n" + str(my_iota_evm_tvl) + "\n" + change_percent["daily"] + "\n" + change_percent["weekly"]}})
+        embed.add_field(name="TVL (DeFiLlama)", value=f"{my_iota_evm_tvl}", inline=True)
+        slack_data.append({"type": "section", "text": {"type": "mrkdwn", "text": "*TVL (DeFiLlama)*\n" + str(my_iota_evm_tvl) + "\n" + change_percent["daily"] + "\n" + change_percent["weekly"]}})
 
         current_value = geckoterminal_tvl
         last_day_value
@@ -619,8 +621,8 @@ async def build_embed():
         change_percent = calc_change_percent(current_value, last_day_value, last_week_value)
 
         my_iota_tvl_geckoterminal = await format_currency(geckoterminal_tvl)
-        embed.add_field(name="Total Value Locked (Geckoterminal)", value=f"{my_iota_tvl_geckoterminal}", inline=True)
-        slack_data.append({"type": "section", "text": {"type": "mrkdwn", "text": "*Total Value Locked (Geckoterminal)*\n" + str(my_iota_tvl_geckoterminal) + "\n" + change_percent["daily"] + "\n" + change_percent["weekly"]}})
+        embed.add_field(name="TVL (Geckoterminal)", value=f"{my_iota_tvl_geckoterminal}", inline=True)
+        slack_data.append({"type": "section", "text": {"type": "mrkdwn", "text": "*TVL (Geckoterminal)*\n" + str(my_iota_tvl_geckoterminal) + "\n" + change_percent["daily"] + "\n" + change_percent["weekly"]}})
 
         current_value = total_defi_tx_24h
         last_day_value = market_data_current_week[last_weekday]["24h-defi-txs"]
