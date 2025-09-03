@@ -21,7 +21,7 @@ from helpers.smr_market_data.smd_coingecko import get_coingecko_exchange_data
 from helpers.smr_market_data.smd_coingecko import get_coingecko_24h_trading_volume
 from helpers.smr_market_data.smd_shimmer import get_shimmer_data
 from helpers.smr_market_data.smd_geckoterminal import get_geckoterminal_data, get_geckoterminal_data_tvl 
-from helpers.smr_market_data.smd_defillama import get_defillama_data
+from helpers.smr_market_data.smd_defillama import get_defillama_data, get_tvl_protocols
 
 
 logger = logging.getLogger("discord_bot")
@@ -285,7 +285,7 @@ def get_market_data_L1_last_week():
         0: {
             "iota-price-coingecko": 0.18648,
             "24h-volume-coingecko": 11_520_200.05,
-            "tvl-defilama": 6_090_105.71,
+            "tvl-defilama": 31_090_105.71,
             "tvl-geckoterminal": 4_493_398.38,
             "24h-defi-txs": 5113,
             "24h-defi-volume": 808_898.51
@@ -294,7 +294,7 @@ def get_market_data_L1_last_week():
         1: {
             "iota-price-coingecko": 0.18648,
             "24h-volume-coingecko": 11_520_200.05,
-            "tvl-defilama": 6_090_105.71,
+            "tvl-defilama": 31_090_105.71,
             "tvl-geckoterminal": 4_493_398.38,
             "24h-defi-txs": 5113,
             "24h-defi-volume": 808_898.51
@@ -303,7 +303,7 @@ def get_market_data_L1_last_week():
         2: {
             "iota-price-coingecko": 0.18648,
             "24h-volume-coingecko": 11_520_200.05,
-            "tvl-defilama": 6_090_105.71,
+            "tvl-defilama": 31_090_105.71,
             "tvl-geckoterminal": 4_493_398.38,
             "24h-defi-txs": 5113,
             "24h-defi-volume": 808_898.51
@@ -312,7 +312,7 @@ def get_market_data_L1_last_week():
         3: {
             "iota-price-coingecko": 0.18648,
             "24h-volume-coingecko": 11_520_200.05,
-            "tvl-defilama": 6_090_105.71,
+            "tvl-defilama": 31_090_105.71,
             "tvl-geckoterminal": 4_493_398.38,
             "24h-defi-txs": 5113,
             "24h-defi-volume": 808_898.51
@@ -321,7 +321,7 @@ def get_market_data_L1_last_week():
         4: {
             "iota-price-coingecko": 0.18648,
             "24h-volume-coingecko": 11_520_200.05,
-            "tvl-defilama": 6_090_105.71,
+            "tvl-defilama": 31_090_105.71,
             "tvl-geckoterminal": 4_493_398.38,
             "24h-defi-txs": 5113,
             "24h-defi-volume": 808_898.51
@@ -330,7 +330,7 @@ def get_market_data_L1_last_week():
         5: {
             "iota-price-coingecko": 0.18648,
             "24h-volume-coingecko": 11_520_200.05,
-            "tvl-defilama": 6_090_105.71,
+            "tvl-defilama": 31_090_105.71,
             "tvl-geckoterminal": 4_493_398.38,
             "24h-defi-txs": 5113,
             "24h-defi-volume": 808_898.51
@@ -339,7 +339,7 @@ def get_market_data_L1_last_week():
         6: {
             "iota-price-coingecko": 0.18648,
             "24h-volume-coingecko": 11_520_200.05,
-            "tvl-defilama": 6_090_105.71,
+            "tvl-defilama": 31_090_105.71,
             "tvl-geckoterminal": 4_493_398.38,
             "24h-defi-txs": 5113,
             "24h-defi-volume": 808_898.51
@@ -353,7 +353,7 @@ def get_market_data_L1_current_week():
         0: {
             "iota-price-coingecko": 0.18648,
             "24h-volume-coingecko": 11_520_200.05,
-            "tvl-defilama": 6_090_105.71,
+            "tvl-defilama": 31_090_105.71,
             "tvl-geckoterminal": 4_493_398.38,
             "24h-defi-txs": 5113,
             "24h-defi-volume": 808_898.51
@@ -362,7 +362,7 @@ def get_market_data_L1_current_week():
         1: {
             "iota-price-coingecko": 0.18648,
             "24h-volume-coingecko": 11_520_200.05,
-            "tvl-defilama": 6_090_105.71,
+            "tvl-defilama": 31_090_105.71,
             "tvl-geckoterminal": 4_493_398.38,
             "24h-defi-txs": 5113,
             "24h-defi-volume": 808_898.51
@@ -371,7 +371,7 @@ def get_market_data_L1_current_week():
         2: {
             "iota-price-coingecko": 0.18648,
             "24h-volume-coingecko": 11_520_200.05,
-            "tvl-defilama": 6_090_105.71,
+            "tvl-defilama": 31_090_105.71,
             "tvl-geckoterminal": 4_493_398.38,
             "24h-defi-txs": 5113,
             "24h-defi-volume": 808_898.51
@@ -380,7 +380,7 @@ def get_market_data_L1_current_week():
         3: {
             "iota-price-coingecko": 0.18648,
             "24h-volume-coingecko": 11_520_200.05,
-            "tvl-defilama": 6_090_105.71,
+            "tvl-defilama": 31_090_105.71,
             "tvl-geckoterminal": 4_493_398.38,
             "24h-defi-txs": 5113,
             "24h-defi-volume": 808_898.51
@@ -389,7 +389,7 @@ def get_market_data_L1_current_week():
         4: {
             "iota-price-coingecko": 0.18648,
             "24h-volume-coingecko": 11_520_200.05,
-            "tvl-defilama": 6_090_105.71,
+            "tvl-defilama": 31_090_105.71,
             "tvl-geckoterminal": 4_493_398.38,
             "24h-defi-txs": 5113,
             "24h-defi-volume": 808_898.51
@@ -398,7 +398,7 @@ def get_market_data_L1_current_week():
         5: {
             "iota-price-coingecko": 0.18648,
             "24h-volume-coingecko": 11_520_200.05,
-            "tvl-defilama": 6_090_105.71,
+            "tvl-defilama": 31_090_105.71,
             "tvl-geckoterminal": 4_493_398.38,
             "24h-defi-txs": 5113,
             "24h-defi-volume": 808_898.51
@@ -407,7 +407,7 @@ def get_market_data_L1_current_week():
         6: {
             "iota-price-coingecko": 0.18648,
             "24h-volume-coingecko": 11_520_200.05,
-            "tvl-defilama": 6_090_105.71,
+            "tvl-defilama": 31_090_105.71,
             "tvl-geckoterminal": 4_493_398.38,
             "24h-defi-txs": 5113,
             "24h-defi-volume": 808_898.51
@@ -507,7 +507,10 @@ async def build_embed():
         # current_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
         coingecko_data = await get_coingecko_exchange_data()
         coingecko_24h_vol = await get_coingecko_24h_trading_volume()
+
         defillama_data = await get_defillama_data()
+        tvl_protocols = await get_tvl_protocols()
+        
         geckoterminal_data = await get_geckoterminal_data()
         geckoterminal_tvl = await get_geckoterminal_data_tvl()
         shimmer_data = await get_shimmer_data()
@@ -555,15 +558,22 @@ async def build_embed():
         embed.add_field(name="IOTA L1 Rank (DeFiLlama)", value=iota_L1_rank, inline=True)
         slack_data.append({"type": "section", "text": {"type": "mrkdwn", "text": "*IOTA L1 Rank (DeFiLlama)*\n" + str(iota_L1_rank) }})
 
-        my_iota_L1_tvl = await format_currency(defillama_data['iota_L1_tvl'])
+        swirl_tvl = tvl_protocols['swirl']
+        my_iota_L1_tvl_total = float(swirl_tvl) + float(defillama_data['iota_L1_tvl'])
+        my_iota_L1_tvl_total_format = await format_currency(my_iota_L1_tvl_total)
+        
 
-        current_value = defillama_data['iota_L1_tvl']
+        current_value = my_iota_L1_tvl_total
         last_day_value = market_data_L1_current_week[last_weekday]["tvl-defilama"]
         last_week_value = market_data_L1_last_week[current_weekday]["tvl-defilama"]
         change_percent = calc_change_percent(current_value, last_day_value, last_week_value)
 
-        embed.add_field(name="Total Value Locked (DeFiLlama)", value=f"{my_iota_L1_tvl}", inline=True)
-        slack_data.append({"type": "section", "text": {"type": "mrkdwn", "text": "*Total Value Locked (DeFiLlama)*\n" + str(my_iota_L1_tvl) + "\n" + change_percent["daily"] + "\n" + change_percent["weekly"]}})
+        tvl_protocols_str = ""
+        for protocol, tvl in tvl_protocols.items():
+            tvl_protocols_str += f"\n{protocol}: {format_currency(tvl)}"
+
+        embed.add_field(name="Total Value Locked (DeFiLlama)", value=f"{my_iota_L1_tvl_total_format}", inline=True)
+        slack_data.append({"type": "section", "text": {"type": "mrkdwn", "text": "*Total Value Locked (DeFiLlama)*\n" + str(my_iota_L1_tvl_total_format) + "\n" + change_percent["daily"] + "\n" + change_percent["weekly"] + tvl_protocols_str}})
 
         ################################################
 

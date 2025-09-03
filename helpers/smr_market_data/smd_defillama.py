@@ -13,9 +13,12 @@ logger = logging.getLogger("discord_bot")
 # Load configuration
 config = configuration_manager.load_config('config.json')
 
+# swirl, pools-finance, virtue
+protocols = config["protocols"]
+
 async def get_defillama_data():
     """
-    Get DefiLlama TVL data for both IOTA EVM and IOTA L1.
+    Get DefiLlama TVL data for both IOTA EVM and IOTA L1 and also calc rank.
     
     Returns:
         dict: Dictionary containing IOTA EVM TVL and rank.
@@ -66,3 +69,29 @@ async def get_defillama_data():
         logger.error("HTTP Error occurred: %s", errh)
     except requests.exceptions.RequestException as err:
         logger.error("Request Exception occurred: %s", err)
+
+async def get_tvl_protocols():
+    """
+    Get DefiLlama TVL for protocols on IOTA L1
+    """
+    logger.info("Get DefiLlama TVL for protocols on IOTA L1")
+    defillama_url = "https://api.llama.fi/tvl"
+    headers = {"accept": "*/*"}
+
+    tvl_protocols = {}
+
+    for protocol in protocols:
+        try:
+            tvl_response = requests.get(f"{defillama_url}/{protocol}", headers=headers, timeout=10)
+            tvl_response.raise_for_status()  # Raise HTTPError for bad requests (4xx and 5xx status codes)
+            logger.debug("DefiLlama TVL response: %s", tvl_response.text)
+            
+            if tvl_response.status_code == 200:
+                tvl_data = tvl_response.json()
+                tvl_protocols[protocol] = tvl_data
+
+        except requests.exceptions.RequestException:
+            tvl_protocols[protocol] = 0
+            logger.error("DefiLlama API RequestException.")
+
+    return tvl_protocols
