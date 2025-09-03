@@ -31,6 +31,58 @@ config = configuration_manager.load_config('config.json')
 
 slack_channel = config["slack_channel"]
 
+def get_current_weekday():
+    today = datetime.datetime.today()
+    return today.weekday()
+
+def get_last_weekday():
+    today = datetime.datetime.today()
+    current_week_day = today.weekday() 
+    if (current_week_day == 0):
+        return 6
+    else:
+        return current_week_day - 1
+
+def calc_change_percent(current_value, last_day_value, last_week_value):
+    current_value_float = float(current_value)
+
+    my_daily_change = ""
+    my_weekly_change = ""
+    
+    # Calc daily change
+    try:
+        last_day_value_float = float(last_day_value)
+
+        change_percent_daily = round((((current_value_float - last_day_value_float) / current_value_float) * 100), 2)
+
+        sign_daily = ""
+        if (change_percent_daily > 0):
+            sign_daily = "+"
+        
+        my_daily_change = "Daily change: " + sign_daily + str(change_percent_daily) + " %"
+    except Exception:
+        my_daily_change = "Daily change: N/A"
+
+    # Calc weekly change
+    try:
+        last_week_value_float = float(last_week_value)
+
+        change_percent_weekly = round((((current_value_float - last_week_value_float) / current_value_float) * 100), 2)
+
+        sign_weekly = ""
+        if (change_percent_weekly > 0):
+            sign_weekly = "+"
+
+        my_weekly_change = "Weekly change: " + sign_weekly + str(change_percent_weekly) + " %" 
+    except Exception:
+        my_weekly_change = "Weekly change: N/A"
+
+    return {
+        "daily": my_daily_change,
+        "weekly": my_weekly_change
+    }
+
+############## For IOTA EVM ####################
 market_data_current_week_file_path = "assets/market_data_current_week.pkl"
 market_data_last_week_file_path = "assets/market_data_last_week.pkl"
 
@@ -170,57 +222,6 @@ def get_market_data_current_week():
         }
     }
 
-def get_current_weekday():
-    today = datetime.datetime.today()
-    return today.weekday()
-
-def get_last_weekday():
-    today = datetime.datetime.today()
-    current_week_day = today.weekday() 
-    if (current_week_day == 0):
-        return 6
-    else:
-        return current_week_day - 1
-
-def calc_change_percent(current_value, last_day_value, last_week_value):
-    current_value_float = float(current_value)
-
-    my_daily_change = ""
-    my_weekly_change = ""
-    
-    # Calc daily change
-    try:
-        last_day_value_float = float(last_day_value)
-
-        change_percent_daily = round((((current_value_float - last_day_value_float) / current_value_float) * 100), 2)
-
-        sign_daily = ""
-        if (change_percent_daily > 0):
-            sign_daily = "+"
-        
-        my_daily_change = "Daily change: " + sign_daily + str(change_percent_daily) + " %"
-    except Exception:
-        my_daily_change = "Daily change: N/A"
-
-    # Calc weekly change
-    try:
-        last_week_value_float = float(last_week_value)
-
-        change_percent_weekly = round((((current_value_float - last_week_value_float) / current_value_float) * 100), 2)
-
-        sign_weekly = ""
-        if (change_percent_weekly > 0):
-            sign_weekly = "+"
-
-        my_weekly_change = "Weekly change: " + sign_weekly + str(change_percent_weekly) + " %" 
-    except Exception:
-        my_weekly_change = "Weekly change: N/A"
-
-    return {
-        "daily": my_daily_change,
-        "weekly": my_weekly_change
-    }
-
 # If not exist, 2 files of market data for current week and last week will be created with dump data
 def create_market_data_files():
     if (not os.path.isfile(market_data_current_week_file_path)):
@@ -271,57 +272,197 @@ def update_market_data_last_week_file(market_data_current_week, current_weekday)
 
     logger.info("update_market_data_last_week_file on every Wednesday - done")
 
-async def commented_out_func():
-    # Set up Bitfinex order book depth
-    bitfinex_order_book_data = await calculate_total_bitfinex_depth(coingecko_data['usd_price'])
-    logger.debug("Final bitfinex_order_book_data: %s", bitfinex_order_book_data)
+################################################
 
+############## For IOTA L1 ####################
+market_data_L1_current_week_file_path = "assets/market_data_L1_current_week.pkl"
+market_data_L1_last_week_file_path = "assets/market_data_L1_last_week.pkl"
 
-    positive_order_book_depth_str_2_percent = ""
-    negative_order_book_depth_str_2_percent = ""
-    positive_order_book_depth_str_5_percent = ""
-    negative_order_book_depth_str_5_percent = ""
-    positive_order_book_depth_str_10_percent = ""
-    negative_order_book_depth_str_10_percent = ""
-    positive_order_book_depth_str_20_percent = ""
-    negative_order_book_depth_str_20_percent = ""
+# Static data if the file does not exist
+def get_market_data_L1_last_week():
+    return {
+        # monday
+        0: {
+            "iota-price-coingecko": 0.18648,
+            "24h-volume-coingecko": 11_520_200.05,
+            "tvl-defilama": 6_090_105.71,
+            "tvl-geckoterminal": 4_493_398.38,
+            "24h-defi-txs": 5113,
+            "24h-defi-volume": 808_898.51
+        },
+        # tuesday
+        1: {
+            "iota-price-coingecko": 0.18648,
+            "24h-volume-coingecko": 11_520_200.05,
+            "tvl-defilama": 6_090_105.71,
+            "tvl-geckoterminal": 4_493_398.38,
+            "24h-defi-txs": 5113,
+            "24h-defi-volume": 808_898.51
+        },
+        # wednesday
+        2: {
+            "iota-price-coingecko": 0.18648,
+            "24h-volume-coingecko": 11_520_200.05,
+            "tvl-defilama": 6_090_105.71,
+            "tvl-geckoterminal": 4_493_398.38,
+            "24h-defi-txs": 5113,
+            "24h-defi-volume": 808_898.51
+        },
+        # thursday
+        3: {
+            "iota-price-coingecko": 0.18648,
+            "24h-volume-coingecko": 11_520_200.05,
+            "tvl-defilama": 6_090_105.71,
+            "tvl-geckoterminal": 4_493_398.38,
+            "24h-defi-txs": 5113,
+            "24h-defi-volume": 808_898.51
+        },
+        # friday
+        4: {
+            "iota-price-coingecko": 0.18648,
+            "24h-volume-coingecko": 11_520_200.05,
+            "tvl-defilama": 6_090_105.71,
+            "tvl-geckoterminal": 4_493_398.38,
+            "24h-defi-txs": 5113,
+            "24h-defi-volume": 808_898.51
+        },
+        # saturday
+        5: {
+            "iota-price-coingecko": 0.18648,
+            "24h-volume-coingecko": 11_520_200.05,
+            "tvl-defilama": 6_090_105.71,
+            "tvl-geckoterminal": 4_493_398.38,
+            "24h-defi-txs": 5113,
+            "24h-defi-volume": 808_898.51
+        },
+        # sunday
+        6: {
+            "iota-price-coingecko": 0.18648,
+            "24h-volume-coingecko": 11_520_200.05,
+            "tvl-defilama": 6_090_105.71,
+            "tvl-geckoterminal": 4_493_398.38,
+            "24h-defi-txs": 5113,
+            "24h-defi-volume": 808_898.51
+        }
+    }
 
+# Static data if the file does not exist
+def get_market_data_L1_current_week():
+    return {
+        # monday
+        0: {
+            "iota-price-coingecko": 0.18648,
+            "24h-volume-coingecko": 11_520_200.05,
+            "tvl-defilama": 6_090_105.71,
+            "tvl-geckoterminal": 4_493_398.38,
+            "24h-defi-txs": 5113,
+            "24h-defi-volume": 808_898.51
+        },
+        # tuesday
+        1: {
+            "iota-price-coingecko": 0.18648,
+            "24h-volume-coingecko": 11_520_200.05,
+            "tvl-defilama": 6_090_105.71,
+            "tvl-geckoterminal": 4_493_398.38,
+            "24h-defi-txs": 5113,
+            "24h-defi-volume": 808_898.51
+        },
+        # wednesday
+        2: {
+            "iota-price-coingecko": 0.18648,
+            "24h-volume-coingecko": 11_520_200.05,
+            "tvl-defilama": 6_090_105.71,
+            "tvl-geckoterminal": 4_493_398.38,
+            "24h-defi-txs": 5113,
+            "24h-defi-volume": 808_898.51
+        },
+        # thursday
+        3: {
+            "iota-price-coingecko": 0.18648,
+            "24h-volume-coingecko": 11_520_200.05,
+            "tvl-defilama": 6_090_105.71,
+            "tvl-geckoterminal": 4_493_398.38,
+            "24h-defi-txs": 5113,
+            "24h-defi-volume": 808_898.51
+        },
+        # friday
+        4: {
+            "iota-price-coingecko": 0.18648,
+            "24h-volume-coingecko": 11_520_200.05,
+            "tvl-defilama": 6_090_105.71,
+            "tvl-geckoterminal": 4_493_398.38,
+            "24h-defi-txs": 5113,
+            "24h-defi-volume": 808_898.51
+        },
+        # saturday
+        5: {
+            "iota-price-coingecko": 0.18648,
+            "24h-volume-coingecko": 11_520_200.05,
+            "tvl-defilama": 6_090_105.71,
+            "tvl-geckoterminal": 4_493_398.38,
+            "24h-defi-txs": 5113,
+            "24h-defi-volume": 808_898.51
+        },
+        # sunday
+        6: {
+            "iota-price-coingecko": 0.18648,
+            "24h-volume-coingecko": 11_520_200.05,
+            "tvl-defilama": 6_090_105.71,
+            "tvl-geckoterminal": 4_493_398.38,
+            "24h-defi-txs": 5113,
+            "24h-defi-volume": 808_898.51
+        }
+    }
 
-    # Iterate through the order book data and format the strings
-    for percentage, data in bitfinex_order_book_data['total_order_book_depth'].items():
+# If not exist, 2 files of market data for current week and last week will be created with dump data
+def create_market_data_L1_files():
+    if (not os.path.isfile(market_data_L1_current_week_file_path)):
+        past_data = get_market_data_L1_current_week()
+        with open(market_data_L1_current_week_file_path, "wb") as f:
+            pickle.dump(json.dumps(past_data), f)
+            f.close()
 
-        # Format the 'buy' data using format_currency() function
-        if 'buy' in data:
-            formatted_buy_data = await format_currency(data['buy'], "SMR")
-            buy_data = f"Buy: {formatted_buy_data}\n\n"
-        else:
-            logger.error(f"Missing 'buy' key for percentage level {percentage}")
+    if (not os.path.isfile(market_data_L1_last_week_file_path)):
+        past_data = get_market_data_L1_last_week()
+        with open(market_data_L1_last_week_file_path, "wb") as f:
+            pickle.dump(json.dumps(past_data), f)
+            f.close()
 
-        # Format the 'sell' data using format_currency() function
-        if 'sell' in data:
-            formatted_sell_data = await format_currency(data['sell'], "SMR")
-            sell_data = f"Sell: {formatted_sell_data}\n\n"
-        else:
-            logger.error(f"Missing 'sell' key for percentage level {percentage}")
+def get_market_data_L1():
+    market_data_L1_current_week = ""
+    with open(market_data_L1_current_week_file_path, "rb") as f:
+        market_data_L1_current_week = json.loads(pickle.load(f))
+        f.close()
 
-        buy_sell_info = f"**{percentage}**:\n{buy_data if percentage.startswith('-') else sell_data}"
+    market_data_L1_last_week = ""
+    with open(market_data_L1_last_week_file_path, "rb") as f:
+        market_data_L1_last_week = json.loads(pickle.load(f))
+        f.close()
 
-        if int(percentage[:-1]) == -2:
-            negative_order_book_depth_str_2_percent += buy_sell_info
-        elif int(percentage[:-1]) == -5:
-            negative_order_book_depth_str_5_percent += buy_sell_info
-        elif int(percentage[:-1]) == -10:
-            negative_order_book_depth_str_10_percent += buy_sell_info
-        elif int(percentage[:-1]) == -20:
-            negative_order_book_depth_str_20_percent += buy_sell_info
-        elif int(percentage[:-1]) == 2:
-            positive_order_book_depth_str_2_percent += buy_sell_info
-        elif int(percentage[:-1]) == 5:
-            positive_order_book_depth_str_5_percent += buy_sell_info
-        elif int(percentage[:-1]) == 10:
-            positive_order_book_depth_str_10_percent += buy_sell_info
-        elif int(percentage[:-1]) == 20:
-            positive_order_book_depth_str_20_percent += buy_sell_info
+    return {
+        "current_week": market_data_L1_current_week,
+        "last_week": market_data_L1_last_week
+    }
+
+# Update whenever the bot restarts
+def update_market_data_L1_current_week_file(market_data_L1_current_week, current_weekday, market_data_L1_current_day_latest):
+    # Update market_data_L1_current_week for the current day with latest values
+    market_data_L1_current_week[current_weekday] = market_data_L1_current_day_latest
+
+    with open(market_data_L1_current_week_file_path, "wb") as f:
+        pickle.dump(json.dumps(market_data_L1_current_week), f)
+        f.close()
+
+# Update only on every wednesday
+def update_market_data_L1_last_week_file(market_data_L1_current_week, current_weekday):
+    if (int(current_weekday) != 2):
+        return
+
+    with open(market_data_L1_last_week_file_path, "wb") as f:
+        pickle.dump(json.dumps(market_data_L1_current_week), f)
+        f.close()
+
+    logger.info("update_market_data_L1_last_week_file on every Wednesday - done")
 
 # Functions
 async def build_embed():
@@ -333,16 +474,29 @@ async def build_embed():
     try:
         # Get market-related data
         create_market_data_files()
+        create_market_data_L1_files()
+
         current_weekday = str(get_current_weekday())
         last_weekday = str(get_last_weekday())
+        
         market_data = get_market_data()
         market_data_current_week = market_data["current_week"]
         market_data_last_week = market_data["last_week"]
-        
+
+        market_data_L1 = get_market_data_L1()
+        market_data_L1_current_week = market_data_L1["current_week"]
+        market_data_L1_last_week = market_data_L1["last_week"]
+
         logger.info("market_data_current_week")
         logger.info(market_data_current_week)
         logger.info("market_data_last_week")
         logger.info(market_data_last_week)
+
+        logger.info("market_data_L1_current_week")
+        logger.info(market_data_L1_current_week)
+        logger.info("market_data_L1_last_week")
+        logger.info(market_data_L1_last_week)
+
         logger.info("current_weekday")
         logger.info(current_weekday)
         logger.info("last_weekday")
@@ -360,10 +514,10 @@ async def build_embed():
         total_defi_tx_24h = geckoterminal_data["total_defi_tx_24h"]
         defi_total_volume = geckoterminal_data['defi_total_volume']
         
-        iota_rank = defillama_data["iota_rank"]
-        discord_timestamp = await generate_discord_timestamp()
+        iota_evm_rank = defillama_data["iota_evm_rank"]
+        iota_L1_rank = defillama_data["iota_L1_rank"]
 
-        # await commented_out_func()
+        discord_timestamp = await generate_discord_timestamp()
 
         # Create an embed instance
         embed = discord.Embed(title="IOTA Market Data", color=0x00FF00)
@@ -392,14 +546,37 @@ async def build_embed():
         slack_data.append({"type": "section", "text": {"type": "mrkdwn", "text": "*24h Volume (Coingecko)*\n" + my_coingecko_24h_vol + "\n" + change_percent["daily"] + "\n" + change_percent["weekly"]}})
 
         embed.add_field(name="\u200b", value="\u200b", inline=False)
-        # slack_data.append({"type": "section", "text": {"type": "mrkdwn", "text": "\n" }})
+        
         slack_data.append({"type": "divider"})
 
-        embed.add_field(name="DeFi Data", value="\u200b", inline=False)
-        slack_data.append({"type": "section", "text": {"type": "mrkdwn", "text": "*DeFi Data*\n" }})
+        ############# DeFi Data of IOTA L1 #############
+        slack_data.append({"type": "divider"})
+        embed.add_field(name="DeFi Data IOTA L1", value="\u200b", inline=False)
+        slack_data.append({"type": "section", "text": {"type": "mrkdwn", "text": "*DeFi Data IOTA L1*\n" }})
 
-        embed.add_field(name="IOTA EVM Rank (DefiLlama)", value=iota_rank, inline=True)
-        slack_data.append({"type": "section", "text": {"type": "mrkdwn", "text": "*IOTA EVM Rank (DefiLlama)*\n" + str(iota_rank) }})
+        embed.add_field(name="IOTA L1 Rank (DeFiLlama)", value=iota_L1_rank, inline=True)
+        slack_data.append({"type": "section", "text": {"type": "mrkdwn", "text": "*IOTA L1 Rank (DeFiLlama)*\n" + str(iota_L1_rank) }})
+
+        my_iota_L1_tvl = await format_currency(defillama_data['iota_L1_tvl'])
+
+        current_value = defillama_data['iota_L1_tvl']
+        last_day_value = market_data_L1_current_week[last_weekday]["tvl-defilama"]
+        last_week_value = market_data_L1_last_week[current_weekday]["tvl-defilama"]
+        change_percent = calc_change_percent(current_value, last_day_value, last_week_value)
+
+        embed.add_field(name="Total Value Locked (DeFiLlama)", value=f"{my_iota_L1_tvl}", inline=True)
+        slack_data.append({"type": "section", "text": {"type": "mrkdwn", "text": "*Total Value Locked (DeFiLlama)*\n" + str(my_iota_L1_tvl) + "\n" + change_percent["daily"] + "\n" + change_percent["weekly"]}})
+
+        ################################################
+
+
+        ############# DeFi Data of IOTA EVM #############
+        slack_data.append({"type": "divider"})
+        embed.add_field(name="DeFi Data IOTA EVM", value="\u200b", inline=False)
+        slack_data.append({"type": "section", "text": {"type": "mrkdwn", "text": "*DeFi Data IOTA EVM*\n" }})
+
+        embed.add_field(name="IOTA EVM Rank (DeFiLlama)", value=iota_evm_rank, inline=True)
+        slack_data.append({"type": "section", "text": {"type": "mrkdwn", "text": "*IOTA EVM Rank (DeFiLlama)*\n" + str(iota_evm_rank) }})
 
         try:
             my_shimmer_onchain_token_amount = await format_currency(await format_shimmer_amount(shimmer_data['shimmer_onchain_token_amount']), 'IOTA')
@@ -408,15 +585,15 @@ async def build_embed():
         except Exception:
             logger.info(traceback.format_exc())
 
-        my_iota_tvl = await format_currency(defillama_data['iota_tvl'])
+        my_iota_evm_tvl = await format_currency(defillama_data['iota_evm_tvl'])
 
-        current_value = defillama_data['iota_tvl']
+        current_value = defillama_data['iota_evm_tvl']
         last_day_value = market_data_current_week[last_weekday]["tvl-defilama"]
         last_week_value = market_data_last_week[current_weekday]["tvl-defilama"]
         change_percent = calc_change_percent(current_value, last_day_value, last_week_value)
 
-        embed.add_field(name="Total Value Locked (DefiLlama)", value=f"{my_iota_tvl}", inline=True)
-        slack_data.append({"type": "section", "text": {"type": "mrkdwn", "text": "*Total Value Locked (DefiLlama)*\n" + str(my_iota_tvl) + "\n" + change_percent["daily"] + "\n" + change_percent["weekly"]}})
+        embed.add_field(name="Total Value Locked (DeFiLlama)", value=f"{my_iota_evm_tvl}", inline=True)
+        slack_data.append({"type": "section", "text": {"type": "mrkdwn", "text": "*Total Value Locked (DeFiLlama)*\n" + str(my_iota_evm_tvl) + "\n" + change_percent["daily"] + "\n" + change_percent["weekly"]}})
 
         current_value = geckoterminal_tvl
         last_day_value
@@ -459,21 +636,6 @@ async def build_embed():
         # slack_data.append({"type": "section", "text": {"type": "mrkdwn", "text": "\n" }})
         slack_data.append({"type": "divider"})
 
-        # embed.add_field(name="ShimmerEVM Order Books", value="\u200b", inline=False)
-        # embed.add_field(name="Order Book depth ±2%", value=f"{negative_order_book_depth_str_2_percent} {positive_order_book_depth_str_2_percent}", inline=True)
-        # embed.add_field(name="\u200b", value="\u200b", inline=False)
-        # embed.add_field(name="Order Book depth ±5%", value=f"{negative_order_book_depth_str_5_percent} {positive_order_book_depth_str_5_percent}", inline=True)
-        # embed.add_field(name="\u200b", value="\u200b", inline=False)
-        # embed.add_field(name="Order Book depth ±10%", value=f"{negative_order_book_depth_str_10_percent} {positive_order_book_depth_str_10_percent}", inline=True)
-        # embed.add_field(name="\u200b", value="\u200b", inline=False)
-        # embed.add_field(name="Order Book depth ±20%", value=f"{negative_order_book_depth_str_20_percent} {positive_order_book_depth_str_20_percent}", inline=True)
-        # embed.add_field(name="\u200b", value="\u200b", inline=False)
-
-        # Add additional information
-        # my_source = "Bitfinex, Coingecko, DefiLlama, GeckoTerminal, IOTA API"
-        # embed.add_field(name="Sources", value=f"{my_source}", inline=False)
-        # slack_data.append({"type": "section", "text": {"type": "mrkdwn", "text": "*Sources*\n" + my_source }})
-
         embed.add_field(name="Last Data Update", value=f"{discord_timestamp}", inline=False)
         slack_data.append({"type": "section", "text": {"type": "mrkdwn", "text": "*Last Data Update*\n" + datetime.datetime.now().strftime("%d/%m/%Y %H:%M")}})
 
@@ -494,17 +656,24 @@ async def build_embed():
         market_data_current_day_latest = {
             "iota-price-coingecko": coingecko_data['usd_price'],
             "24h-volume-coingecko": coingecko_24h_vol,
-            "tvl-defilama": defillama_data['iota_tvl'],
+            "tvl-defilama": defillama_data['iota_evm_tvl'],
             "tvl-geckoterminal": geckoterminal_tvl,
             "24h-defi-txs": total_defi_tx_24h,
             "24h-defi-volume": defi_total_volume
         }
-        
         logger.info("market_data_current_day_latest")
         logger.info(market_data_current_day_latest)
-
         update_market_data_current_week_file(market_data_current_week, current_weekday, market_data_current_day_latest)
         update_market_data_last_week_file(market_data_current_week, current_weekday)
+
+        ##########
+
+        market_data_L1_current_day_latest = market_data_current_day_latest
+        market_data_L1_current_day_latest["tvl-defilama"] = defillama_data['iota_L1_tvl']
+        logger.info("market_data_L1_current_day_latest")
+        logger.info(market_data_L1_current_day_latest)
+        update_market_data_L1_current_week_file(market_data_L1_current_week, current_weekday, market_data_L1_current_day_latest)
+        update_market_data_L1_last_week_file(market_data_L1_current_week, current_weekday)
     except Exception:
         logger.info(traceback.format_exc())
 

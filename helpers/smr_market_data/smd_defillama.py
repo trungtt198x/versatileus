@@ -15,7 +15,7 @@ config = configuration_manager.load_config('config.json')
 
 async def get_defillama_data():
     """
-    Get DefiLlama TVL data for IOTA EVM.
+    Get DefiLlama TVL data for both IOTA EVM and IOTA L1.
     
     Returns:
         dict: Dictionary containing IOTA EVM TVL and rank.
@@ -23,8 +23,10 @@ async def get_defillama_data():
     logger.info("Getting the DefiLlama TVL and rank")
     defillama_url = "https://api.llama.fi/v2/chains"
     headers = {"accept": "*/*"}
-    iota_tvl = None
-    rank = None
+    iota_evm_tvl = None
+    iota_evm_rank = None
+    iota_L1_tvl = None
+    iota_L1_rank = None
 
     try:
         tvl_response = requests.get(defillama_url, headers=headers, timeout=10)
@@ -33,17 +35,30 @@ async def get_defillama_data():
         
         if tvl_response.status_code == 200:
             tvl_data = tvl_response.json()
-            iota_entry = next((entry for entry in tvl_data if entry.get("name") == "IOTA EVM"), None)
-            
-            if iota_entry:
-                iota_tvl = iota_entry.get("tvl")
-                tvl_data.sort(key=lambda x: x.get("tvl", 0), reverse=True)
-                rank = tvl_data.index(iota_entry) + 1
+            # iota_entry = next((entry for entry in tvl_data if entry.get("name") == "IOTA EVM"), None)
 
-                logger.debug("IOTA TVL Value: %s", iota_tvl)
-                logger.debug("IOTA TVL Rank: %s", rank)
-                
-        return {"iota_tvl": iota_tvl, "iota_rank": rank}
+            targets = {"IOTA EVM", "IOTA"}
+            matched_entries = [entry for entry in tvl_data if entry.get("name") in targets]
+
+            # Optionally unpack them if you're sure both exist
+            iota_evm_entry = next((e for e in matched_entries if e.get("name") == "IOTA EVM"), None)
+            iota_L1_entry = next((e for e in matched_entries if e.get("name") == "IOTA"), None)
+
+            tvl_data.sort(key=lambda x: x.get("tvl", 0), reverse=True)
+            
+            if iota_evm_entry:
+                iota_evm_tvl = iota_evm_entry.get("tvl")
+                iota_evm_rank = tvl_data.index(iota_evm_entry) + 1
+                logger.debug("iota_evm_tvl: %s", iota_evm_tvl)
+                logger.debug("iota_evm_rank: %s", iota_evm_rank)
+
+            if iota_L1_entry:
+                iota_L1_tvl = iota_L1_entry.get("tvl")
+                iota_L1_rank = tvl_data.index(iota_L1_entry) + 1
+                logger.debug("iota_L1_tvl: %s", iota_L1_tvl)
+                logger.debug("iota_L1_rank: %s", iota_L1_rank)
+
+        return {"iota_evm_tvl": iota_evm_tvl, "iota_evm_rank": iota_evm_rank, "iota_L1_tvl": iota_L1_tvl, "iota_L1_rank": iota_L1_rank}
 
     except requests.exceptions.Timeout:
         logger.error("DefiLlama API request timed out.")
