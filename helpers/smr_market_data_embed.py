@@ -679,7 +679,10 @@ async def build_embed():
         ##########
 
         market_data_L1_current_day_latest = market_data_current_day_latest
-        market_data_L1_current_day_latest["tvl-defilama"] = defillama_data['iota_L1_tvl']
+        
+        # !! defillama_data['iota_L1_tvl'] does not include TVL of swirl !!
+        market_data_L1_current_day_latest["tvl-defilama"] = my_iota_L1_tvl_total # defillama_data['iota_L1_tvl']
+        
         logger.info("market_data_L1_current_day_latest")
         logger.info(market_data_L1_current_day_latest)
         update_market_data_L1_current_week_file(market_data_L1_current_week, current_weekday, market_data_L1_current_day_latest)
