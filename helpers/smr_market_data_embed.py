@@ -285,7 +285,7 @@ def get_market_data_L1_last_week():
         0: {
             "iota-price-coingecko": 0.18648,
             "24h-volume-coingecko": 11_520_200.05,
-            "tvl-defilama": 31_090_105.71,
+            "tvl-defilama": 20486466,
             "tvl-geckoterminal": 4_493_398.38,
             "24h-defi-txs": 5113,
             "24h-defi-volume": 808_898.51
@@ -294,7 +294,7 @@ def get_market_data_L1_last_week():
         1: {
             "iota-price-coingecko": 0.18648,
             "24h-volume-coingecko": 11_520_200.05,
-            "tvl-defilama": 31_090_105.71,
+            "tvl-defilama": 20637187,
             "tvl-geckoterminal": 4_493_398.38,
             "24h-defi-txs": 5113,
             "24h-defi-volume": 808_898.51
@@ -303,7 +303,7 @@ def get_market_data_L1_last_week():
         2: {
             "iota-price-coingecko": 0.18648,
             "24h-volume-coingecko": 11_520_200.05,
-            "tvl-defilama": 31_090_105.71,
+            "tvl-defilama": 22398207,
             "tvl-geckoterminal": 4_493_398.38,
             "24h-defi-txs": 5113,
             "24h-defi-volume": 808_898.51
@@ -312,7 +312,7 @@ def get_market_data_L1_last_week():
         3: {
             "iota-price-coingecko": 0.18648,
             "24h-volume-coingecko": 11_520_200.05,
-            "tvl-defilama": 31_090_105.71,
+            "tvl-defilama": 21935651,
             "tvl-geckoterminal": 4_493_398.38,
             "24h-defi-txs": 5113,
             "24h-defi-volume": 808_898.51
@@ -321,7 +321,7 @@ def get_market_data_L1_last_week():
         4: {
             "iota-price-coingecko": 0.18648,
             "24h-volume-coingecko": 11_520_200.05,
-            "tvl-defilama": 31_090_105.71,
+            "tvl-defilama": 21861243,
             "tvl-geckoterminal": 4_493_398.38,
             "24h-defi-txs": 5113,
             "24h-defi-volume": 808_898.51
@@ -330,7 +330,7 @@ def get_market_data_L1_last_week():
         5: {
             "iota-price-coingecko": 0.18648,
             "24h-volume-coingecko": 11_520_200.05,
-            "tvl-defilama": 31_090_105.71,
+            "tvl-defilama": 21029774,
             "tvl-geckoterminal": 4_493_398.38,
             "24h-defi-txs": 5113,
             "24h-defi-volume": 808_898.51
@@ -339,7 +339,7 @@ def get_market_data_L1_last_week():
         6: {
             "iota-price-coingecko": 0.18648,
             "24h-volume-coingecko": 11_520_200.05,
-            "tvl-defilama": 31_090_105.71,
+            "tvl-defilama": 21757237,
             "tvl-geckoterminal": 4_493_398.38,
             "24h-defi-txs": 5113,
             "24h-defi-volume": 808_898.51
@@ -351,66 +351,60 @@ def get_market_data_L1_current_week():
     return {
         # monday
         0: {
-            "iota-price-coingecko": 0.18648,
-            "24h-volume-coingecko": 11_520_200.05,
-            "tvl-defilama": 31_090_105.71,
-            "tvl-geckoterminal": 4_493_398.38,
-            "24h-defi-txs": 5113,
-            "24h-defi-volume": 808_898.51
+            "iota-price-coingecko": 0.10332,
+            "24h-volume-coingecko": 10638292.397870101,
+            "tvl-defilama": 21796708,
+            "tvl-geckoterminal": 2114047.9193832357,
+            "24h-defi-txs": 6219,
+            "24h-defi-volume": 833751.0748054091
         },
-        # tuesday
         1: {
-            "iota-price-coingecko": 0.18648,
-            "24h-volume-coingecko": 11_520_200.05,
-            "tvl-defilama": 31_090_105.71,
-            "tvl-geckoterminal": 4_493_398.38,
-            "24h-defi-txs": 5113,
-            "24h-defi-volume": 808_898.51
+            "iota-price-coingecko": 0.10311,
+            "24h-volume-coingecko": 6183352.220835024,
+            "tvl-defilama": 21540853,
+            "tvl-geckoterminal": 2103985.7997827115,
+            "24h-defi-txs": 4343,
+            "24h-defi-volume": 401352.25486105116
         },
-        # wednesday
         2: {
-            "iota-price-coingecko": 0.18648,
-            "24h-volume-coingecko": 11_520_200.05,
-            "tvl-defilama": 31_090_105.71,
-            "tvl-geckoterminal": 4_493_398.38,
-            "24h-defi-txs": 5113,
-            "24h-defi-volume": 808_898.51
+            "iota-price-coingecko": 0.10736,
+            "24h-volume-coingecko": 8097858.634048514,
+            "tvl-defilama": 21990860,
+            "tvl-geckoterminal": 2140664.8483257857,
+            "24h-defi-txs": 4207,
+            "24h-defi-volume": 152732.87813865682
         },
-        # thursday
         3: {
-            "iota-price-coingecko": 0.18648,
-            "24h-volume-coingecko": 11_520_200.05,
-            "tvl-defilama": 31_090_105.71,
-            "tvl-geckoterminal": 4_493_398.38,
-            "24h-defi-txs": 5113,
-            "24h-defi-volume": 808_898.51
+            "iota-price-coingecko": 0.10376,
+            "24h-volume-coingecko": 16282165.593754204,
+            "tvl-defilama": 21935651,
+            "tvl-geckoterminal": 2152064.7103469977,
+            "24h-defi-txs": 4990,
+            "24h-defi-volume": 542987.8464112143
         },
-        # friday
         4: {
-            "iota-price-coingecko": 0.18648,
-            "24h-volume-coingecko": 11_520_200.05,
-            "tvl-defilama": 31_090_105.71,
-            "tvl-geckoterminal": 4_493_398.38,
-            "24h-defi-txs": 5113,
-            "24h-defi-volume": 808_898.51
+            "iota-price-coingecko": 0.10215,
+            "24h-volume-coingecko": 12763296.685251333,
+            "tvl-defilama": 21861243,
+            "tvl-geckoterminal": 2087808.8146087038,
+            "24h-defi-txs": 4075,
+            "24h-defi-volume": 397009.25149358186
         },
-        # saturday
         5: {
-            "iota-price-coingecko": 0.18648,
-            "24h-volume-coingecko": 11_520_200.05,
-            "tvl-defilama": 31_090_105.71,
-            "tvl-geckoterminal": 4_493_398.38,
-            "24h-defi-txs": 5113,
-            "24h-defi-volume": 808_898.51
+            "iota-price-coingecko": 0.09914,
+            "24h-volume-coingecko": 12256535.139449537,
+            "tvl-defilama": 21029774,
+            "tvl-geckoterminal": 2064314.235876734,
+            "24h-defi-txs": 9387,
+            "24h-defi-volume": 1266881.7981159333
         },
-        # sunday
         6: {
-            "iota-price-coingecko": 0.18648,
-            "24h-volume-coingecko": 11_520_200.05,
-            "tvl-defilama": 31_090_105.71,
-            "tvl-geckoterminal": 4_493_398.38,
-            "24h-defi-txs": 5113,
-            "24h-defi-volume": 808_898.51
+            "iota-price-coingecko": 0.10253,
+            "24h-volume-coingecko": 8613254.884936422,
+            "tvl-defilama": 21757237,
+            "tvl-geckoterminal": 2088894.8040767333,
+            "24h-defi-txs": 3475,
+            "24h-defi-volume": 361665.73704730626
         }
     }
 
