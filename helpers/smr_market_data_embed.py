@@ -599,24 +599,29 @@ async def build_embed():
         embed.add_field(name="TVL (DeFiLlama)", value=f"{my_iota_evm_tvl}", inline=True)
         slack_data.append({"type": "section", "text": {"type": "mrkdwn", "text": "*TVL (DeFiLlama)*\n" + str(my_iota_evm_tvl) + "\n" + change_percent["daily"] + "\n" + change_percent["weekly"]}})
 
-        current_value = geckoterminal_tvl
-        last_day_value
-        last_week_value
         try:
-            last_day_value = market_data_current_week[last_weekday]["tvl-geckoterminal"]
-        except Exception:
-            last_day_value = None
+            current_value = geckoterminal_tvl
+            last_day_value
+            last_week_value
+            try:
+                last_day_value = market_data_current_week[last_weekday]["tvl-geckoterminal"]
+            except Exception:
+                last_day_value = None
 
-        try:
-            last_week_value = market_data_last_week[current_weekday]["tvl-geckoterminal"]
-        except Exception:
-            last_week_value = None
-        
-        change_percent = calc_change_percent(current_value, last_day_value, last_week_value)
+            try:
+                last_week_value = market_data_last_week[current_weekday]["tvl-geckoterminal"]
+            except Exception:
+                last_week_value = None
+            
+            change_percent = calc_change_percent(current_value, last_day_value, last_week_value)
 
-        my_iota_tvl_geckoterminal = await format_currency(geckoterminal_tvl)
-        embed.add_field(name="TVL (Geckoterminal)", value=f"{my_iota_tvl_geckoterminal}", inline=True)
-        slack_data.append({"type": "section", "text": {"type": "mrkdwn", "text": "*TVL (Geckoterminal)*\n" + str(my_iota_tvl_geckoterminal) + "\n" + change_percent["daily"] + "\n" + change_percent["weekly"]}})
+            my_iota_tvl_geckoterminal = await format_currency(geckoterminal_tvl)
+            embed.add_field(name="TVL (Geckoterminal)", value=f"{my_iota_tvl_geckoterminal}", inline=True)
+            slack_data.append({"type": "section", "text": {"type": "mrkdwn", "text": "*TVL (Geckoterminal)*\n" + str(my_iota_tvl_geckoterminal) + "\n" + change_percent["daily"] + "\n" + change_percent["weekly"]}})
+        except Exception:
+            my_iota_tvl_geckoterminal = "Missing due to Coingecko API rate limit!"
+            embed.add_field(name="TVL (Geckoterminal)", value=f"{my_iota_tvl_geckoterminal}", inline=True)
+            slack_data.append({"type": "section", "text": {"type": "mrkdwn", "text": "*TVL (Geckoterminal)*\n" + str(my_iota_tvl_geckoterminal)}})
 
         current_value = total_defi_tx_24h
         last_day_value = market_data_current_week[last_weekday]["24h-defi-txs"]
