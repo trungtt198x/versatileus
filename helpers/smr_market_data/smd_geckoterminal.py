@@ -7,6 +7,7 @@ Version: 5.5.0
 import requests
 import logging
 import helpers.configuration_manager as configuration_manager
+import asyncio
 
 logger = logging.getLogger("discord_bot")
 
@@ -118,6 +119,8 @@ async def get_geckoterminal_data_tvl():
                 break
 
             page += 1
+
+            await asyncio.sleep(5)
         return total_reserve_in_usd
 
     except requests.exceptions.Timeout:
