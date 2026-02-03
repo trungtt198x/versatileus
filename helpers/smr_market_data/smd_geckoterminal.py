@@ -7,7 +7,7 @@ Version: 5.5.0
 import requests
 import logging
 import helpers.configuration_manager as configuration_manager
-import asyncio
+# import asyncio
 
 logger = logging.getLogger("discord_bot")
 
@@ -114,15 +114,13 @@ async def get_geckoterminal_data_tvl():
             elif defi_volume.status_code == 404:
                 logger.info("Status code 404. Pagination ends at page: %d", page)
                 break
-            elif defi_volume.status_code == 429:
-                await asyncio.sleep(10)
             else:
                 logger.error("Unexpected status code: %s", defi_volume.status_code)
                 break
 
             page += 1
 
-            await asyncio.sleep(5)
+            # await asyncio.sleep(1)
         return total_reserve_in_usd
 
     except requests.exceptions.Timeout:
