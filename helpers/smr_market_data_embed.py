@@ -500,12 +500,20 @@ async def build_embed():
         # Get data from API calls
         # current_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
         coingecko_data = await get_coingecko_exchange_data()
+
+        if coingecko_data is None:
+            return
+
         coingecko_24h_vol = await get_coingecko_24h_trading_volume()
 
         defillama_data = await get_defillama_data()
         tvl_protocols = await get_tvl_protocols()
         
         geckoterminal_data = await get_geckoterminal_data()
+        
+        if geckoterminal_data is None:
+            return
+
         geckoterminal_tvl = await get_geckoterminal_data_tvl()
         # shimmer_data = await get_shimmer_data()
         total_defi_tx_24h = geckoterminal_data["total_defi_tx_24h"]
