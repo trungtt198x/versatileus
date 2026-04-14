@@ -659,7 +659,7 @@ async def build_embed():
         # Post data to slack channel
         slack_data = '{"blocks": ' + json.dumps(slack_data) + '}'
         # logger.info(slack_data)
-        res = requests.post(url=slack_channel, data=slack_data)
+        # res = requests.post(url=slack_channel, data=slack_data)
         # logger.info(res)
 
         market_data_current_day_latest = {
